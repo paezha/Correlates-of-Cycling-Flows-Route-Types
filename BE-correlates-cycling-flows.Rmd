@@ -1,0 +1,1000 @@
+---
+title: Correlates of Cycling Flows in Hamilton, Ontario - Fastest, Quietest, or Balanced Routes?
+
+authors: 
+  - name: Elise Desjardins
+    address: School of Geography and Earth Sciences, McMaster University
+    email: desjae@mcmaster.ca
+    footnote: Corresponding Author
+  - name: Christopher D. Higgins
+    address: Department of Human Geography, University of Toronto
+    email: cd.higgins@utoronto.ca
+  - name: Darren M. Scott
+    address: School of Geography and Earth Sciences, McMaster University
+    email: scottdm@mcmaster.ca
+  - name: Emma Apatu
+    address: Department of Health Research Methods, Evidence, and Impact, McMaster University
+    email: apatue@mcmaster.ca
+  - name: Antonio Páez
+    address: School of Geography and Earth Sciences, McMaster University
+    email: paezha@mcmaster.ca
+
+keywords:
+- cycling
+- spatial interaction modelling
+- route choice
+
+abstract: |
+  Cycling is an increasingly popular mode of travel in Canadian urban areas, like the Greater Toronto and Hamilton Area (GTHA). While trip origins and destinations can be inferred from travel surveys, data on route choice is often not collected which makes it challenging to capture the attributes of routes travelled by cyclists. With new algorithms for cycle routing it is now possible to infer routes. Using bicycle trip records from the most recent regional travel survey, a spatial interaction model is developed to investigate the built environment correlates of cycling flows in Hamilton, Ontario, a mid-sized city part of the GTHA. A feature of the analysis is the use of CycleStreets to compare the distance and time according to different routes inferred between trip zones of origin and destination. In addition, network autocorrelation is accounted for in the estimated models. The most parsimonious model suggests that shortest-path quietest routes that minimize traffic best explain the pattern of travel by bicycle in Hamilton. Commercial and office locations and points of interest at the zone of origin negatively correlate with the production of trips, while multiple land uses and the availability of jobs at the zone of destination are trip attractors. The use of a route planner offers a novel approach to modelling and understanding cycling flows within a city. This may be useful for transportation planners to infer different types of routes that cyclists may seek out and consider these in travel demand models.
+
+bibliography: References.bib
+bibstyle: spphys
+citation_package: default
+linenumbers: true
+output: rticles::springer_article
+---
+
+```{r clear-workspace, echo=FALSE}
+rm(list = ls())
+```
+
+```{r load-packages, include = FALSE}
+#`Packages zelig` and `zeligverse` were removed from CRAN but can be downloaded and installed from the archives. Copies of both packages are available in the repository
+#library(cyclestreets)
+library(dplyr)
+library(ggthemes)
+library(kableExtra)
+library(knitr)
+#library(rticles)
+library(sf)
+library(spdep)
+library(tidyverse)
+library(units)
+library(Zelig)
+library(sp)
+```
+
+```{r load-data, include=FALSE}
+load("Correlates-Cycling-Flows-Hamilton.RData")
+#load("Data Cycling Hamilton.RData")
+#load("Ward Boundaries.RData")
+#load("Escarpment.RData")
+#load("Streets.RData")
+```
+
+```{r prepare-data, include=FALSE}
+# Scale variables
+OD_table.sf <- OD_table.sf %>%
+  mutate(Population.o = Population.o/1000,
+         Population.d = Population.d/1000,
+         Points_of_Interest.o = Points_of_Interest.o/1000,
+         Points_of_Interest.d = Points_of_Interest.d/1000,
+         BusStops.o = BusStops.o/100,
+         BusStops.d = BusStops.d/100,
+         Institutions.o = Institutions.o/1000,
+         Institutions.d = Institutions.d/1000,
+         Commercial.o = Commercial.o/1000,
+         Commercial.d = Commercial.d/1000,
+         Residential.o = Residential.o/1000,
+         Residential.d = Residential.d/1000,
+         Population.o = Population.o/1000,
+         Population.d = Population.d/1000,
+         Full_time_jobs.d = Full_time_jobs.d/1000,
+         Part_time_jobs.d = Part_time_jobs.d/1000,
+         Industry.o = Industry.o/1000,
+         Industry.d = Industry.d/1000,
+         Office.o = Office.o/1000,
+         Office.d = Office.d/1000,
+         quietest_distance = units::set_units(quietest_distance, "km"), # convert to km
+         balanced_distance = units::set_units(balanced_distance, "km"), # convert to km
+         fastest_distance = units::set_units(fastest_distance, "km")) # convert to km
+```
+
+
+```{r t-test-gadda, echo=FALSE}
+# Permutation spatial autocorrelation test for generalized models (Jacqmin-Gadda et al. 1997). Code by Patuelli et al. The inputs are a model object and a listw object. The code is modified to accept the output of zelig instead of the base glm.
+
+t.test.gadda = function (x, listw){
+	# Calculate Mean and Variance for T statistics.
+	mu <- unlist(fitted(x))
+	y <- unlist(x$data[all.vars(x$formula)[1]])
+	#listw.nb <- listw$neighbours
+	#listw <- nb2listw(listw.nb, style = "C")
+	S <- nb2mat(listw$neighbours, style = "C", zero.policy = FALSE)
+	S0 <- sum(S)
+	S1 <- 2 * sum(S ^ 2)
+	S2 <- 4 * sum(rowSums(S) ^ 2)
+	N <- dim(S)[1]
+	Tval <- crossprod((y - mu), S) %*% (y - mu)
+	m2 <- sum((y - mu) ^ 2) / N
+	m4 <- sum((y - mu) ^ 4) / N
+	#M <- diag(length(e)) - X %*% chol2inv(chol(t(X)%*%X)) %*% t(X)
+	mean <- - ((m2 * S0) / (N - 1))
+	meantwo <- mean ^ 2
+	twomean1 <- N * (m2 ^ 2) * ((N ^ 2 - 3 * N + 3) * S1 - N * S2 + 3 * (S0 ^ 2))
+	twomean2 <- m4 * ((N ^ 2 - N) * S1 - 2 * N * S2 + 6 * (S0 ^ 2))
+	twomeanfrac <- (N - 1) * (N - 2) * (N - 3)
+	twomean <- (twomean1 - twomean2) / twomeanfrac
+	var <- twomean - meantwo
+	z <- (Tval - mean) / var ^ (1 / 2)
+	pvalue <- pnorm(z, lower.tail = FALSE)
+	cat("z = ", z, "p-value = ", pvalue)
+	return(list(mean = mean, var = var, Tval = Tval, z = z, pvalue = pvalue))
+}
+```
+
+```{r install-package, include=FALSE}
+#devtools::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)
+```
+
+# Introduction {#sec:intro}
+
+Cycling is an increasingly popular mode of travel in Canadian urban areas. From 1996 to 2016 the number of people commuting to work by bicycle in Canadian census metropolitan areas increased by 87.9% and the share of bicycle commute trips grew from 1.2% to 1.6% [@Statscan2017]. Such modal shifts have been prompted in part by the widely recognized health and environmental benefits associated with cycling. Compared to other transportation modes, travelling by bicycle is more enjoyable [@paezEnjoymentCommuteComparison2010], and is associated with better self-perceived health [@Avila2018] and reduced risk of chronic disease [@Celis2017; @Oja2011]. Furthermore, cycling also leads to reduced greehouse gas emissions [@Zahabi2016] and improved air and noise pollution [@deNazelle2011]. These benefits serve as motivation for cities to encourage more travel by this mode, but this requires effort to put cycling on par with other modes of transportation at a policy level. For this reason, many Canadian cities have integrated cycling in their transportation plans in recent years [*inter alia*, see @Calgary2011; @Montreal2017; @Vancouver2012] and have implemented a range of interventions and strategies that have been effective in increasing cycling [@Assuncao2019; @Verlinden2019]. 
+
+The City of Hamilton, a mid-sized city located in the Greater Toronto and Hamilton Area (GTHA) urban region approximately 50 km from Toronto, has experienced an increase in cycling. Approximately one third of all trips in this area are 5 km or less, which is widely considered to be a bikeable distance. In 2016, 1.2% of all trips in Hamilton were made by bicycle according to the latest *Transportation Tomorrow Survey*, the regional travel survey conducted every 5 years [@Dmg2018tts]. This was a two-fold increase from the 2011 survey results when the cycling mode share was only 0.6% [@Dmg2014tts]. Hamilton has also been identified as a city where cycling levels could substantially increase to approximately 35% of the mode share [@Mitra2016]. The increase in bicycle trips in Hamilton between 2011 and 2016 occurred over the same period that cycling interventions were implemented, such as new cycling facilities and a public bicycle-share program. In other words, we suggest that Hamilton can be characterized as a developing cycling city [see @liuWhatMakesGood2020] because efforts to increase cycling have been implemented and cycling levels are growing. Recent studies have used GPS data from the bicycle-share program to conduct route choice analysis [@Lu2018understanding] or explore influences on bike share ridership [@Scott2019factors]. However, we still know relatively little about trips in this city beyond those made by bikeshare. To date, there has been no published research that has investigated the pattern of bicycle trips in Hamilton using data from the 2016 *Transportation Tomorrow Survey*. Our understanding of the spatial distribution of such trips in a mid-sized developing cycling city and the influence of the built environment is also limited.
+
+To address these gaps in knowledge, the objective of this study is to investigate the correlates of cycling flows in Hamilton. This paper describes the development of a spatial interaction model [a component of the four-step travel model; see @deDios2011Modelling] to test the level of cycling flows against various attributes at the zones of origin and destination. Travel surveys are typically rich in terms of information about where trips start or end, but are less informative with respect to route characteristics, which often have to be inferred. For this reason, a feature of the analysis is the use of an algorithm for cycle routing, *CycleStreets*, to infer and compare different routes between the zones of origin and destination instead of using only the shortest-path distance. This algorithm identifies routes according to various attributes and characterizes them as *fastest*, *quietest*, and *balanced* routes. The distance and time from the zone of origin to destination along each inferred route serve as measures of cost in the analysis. The following two questions are addressed: 1) *Which attributes at the zones of origin and destination influence cycling trip flows in Hamilton?*; and 2) *Which type of route best explains the pattern of travel by bicycle in Hamilton?* In addition, residuals from the spatial interaction model are analyzed using a spatial autocorrelation statistic to assess the model's compliance with the assumption of independently distributed residuals. Future opportunities for research and practice, including assessment of the built environment along select routes identified by the algorithm, are also discussed.
+
+Note that all data and code used in this research are available online. The source for this paper is an R markdown document that can be obtained from the following GitHub repository:
+
+> https://github.com/paezha/Correlates-of-Cycling-Flows-Route-Types
+
+# Background {#sec:background}
+
+A diversity of factors influence the decision to commute by bicycle ranging from the natural and built environments to individual and household characteristics [@heinenCommutingBicycleOverview2010]. Where people live, work, and play is particularly important because it influences the transport modes available to them, the destinations and amenities that they can access, and the routes they can travel to get from A to B. As such, the built environment receives a lot of attention in cycling research because factors that are known to influence cycling can be modified by urban and transportation planners to potentially shift a large number of currently motorized trips. Population-based travel surveys are useful for understanding cycling activity and patterns at the city level [@handyPromotingCyclingTransport2014] which can, in turn, support strategic investments where cycling levels have the potential to increase.
+
+The *behavioral model of the environment* was proposed as a theoretical framework for environmental audits to identify the determinants of walking and cycling at three different scales that make up any trip [@Moudon2003walking]. According to this framework, all three spatial areas (i.e., i) the characteristics of the origin, ii) thedestination, and iii) the route) are important and necessary to assess the influence of the built environment on walking and cycling. These modes, more so than motorized travel, allow a traveller to interact more intimately with the micro-level environment [@Moniruzzaman2012; @Moniruzzaman2016; @Moudon2003walking]. This type of framework holds true for bicycle trip analysis as well. Winters et al. [-@Winters2010] conducted a study measuring built environment variables at three different scales in Vancouver, Canada and found that the built environment around the origin and destination, as well as along the route, are indeed different and influence cycling in different ways. This emphasizes the need for travel behaviour models to capture environmental attributes along different parts of the trip, not just at the zone of origin and destination or the community-level.
+
+## Macro-Level Built Environment Factors {#macro}
+
+The urban form at the places where bicycle trips originate and end is important [@Scott2019factors]. This topic is well-documented in the cycling literature. Land use mix, whereby people can reach a variety of amenities within a distance that is comfortable to cycle, influences travel by bicycle [@Cervero2019; @Sallis2013; @Winters2010; @Zhao2014]. For instance, Heesch et al. [-@Heesch2015] found that shorter distances to destinations, including a business district with jobs and a river where there are bicycle paths, increased the odds of cycling in Brisbane, Australia. Higher densities of population [@Nielsen2018; @Nordengen2019; @Schneider2015; @Winters2010] and employment [@Le2018; Zhao2014] are other important factors. In the case of cities with low levels of cycling, access to bicycles can make this mode more attractive. Cole-Hunter et al. [-@ColeHunter2015] report that public bicycle share stations near the residence was a significant positive determinant of commuting by bicycle. The quality of the urban environment also matters. Areas with trees and green space also associated with more cycling [@ColeHunter2015; @Le2018; @Mertens2017].
+
+In most studies, a combination of these attributes are found to influence cycling, which suggests that multiple factors are needed to create spaces that ultimately encourage people to cycle [@Cervero2019]. Higher levels of cycling are typically observed in neighbourhoods with good street connectivity, supportive infrastructure, and a variety of amenities that can be reached in a short distance. However, there is variation in the relative influence of these attributes across studies and across places, which might reveal different effects that are related to contextual behaviours, or planning and transportation policies. For example, residential density [@Scott2019factors; @Zhao2014] and the presence of cycling infrastructure [@moudonCyclingBuiltEnvironment2005a] are not always a significant factors. Therefore, additional analysis to determine the influence of specific attributes on cycling levels is important in developing cycling cities, where such studies have not been previously conducted, which can inform new strategies to induce the uptake of cycling.
+
+## Micro-Level Route Factors {#route}
+
+Cycling infrastructure is often identified as an important attribute in bicycle-friendly cities. It is thought to be fundamental for encouraging more bicycle trips in cities that are predominantly car-centric [@Adam2020]. The provision of, or proximity to, infrastructure has been found to have a influence or assosication with cycling behaviour [*inter alia*, see @Buehler2012; @Buehler2016; @Dill2003; @Mertens2017; @Winters2010]. For example, Le et al. [-@Le2018] found that cycling facilities had a strong association with bicycle volume and traffic based on their analysis of 20 metropolitan statistical areas in the United States. Infrastructure can be very influential - a new bicycle lane in Oslo, Norway attracted trips by shifting cyclists from other parallel routes [@Pritchard2019]. This suggests that it is not uncommon for preferred routes to change as new facilities are built over time and they are incorporated into daily trips. Furthermore, infrastructure can also increase perceptions of cycling safety [@Branion2019] which may encourage more trips. At the very least, cycling infrastructure is a visual and physical sign that streets can accommodate people who choose to travel using this mode.
+
+Studies examining the characteristics along routes travelled by people who cycle is limited but has grown over the past decade owing in part to the availability of new data technologies. Researchers have used a variety of methods to reveal the preferences of cyclists including data obtained from global positioning system (GPS) devices or smartphone applications [@Pritchard2018]. In general, studies using such data confirm that people who cycle prefer routes with separated facilities over mixing with traffic [@Chen2018; @Dill2009; @elAssi2017effects; @Lu2018understanding; @SkovPetersen2018] and incorporate infrastructure as part of their routes [@Dill2009; @Lu2018understanding; @Pritchard2019]. One study conducted in Portland, Oregon using GPS data found that streets with bike lanes were comparable in attractiveness to streets with low traffic volume [@Broach2012]. By examining GPS data from Hamilton's bicycle-sharing program, Lu et al. [-@Lu2018understanding] found that bike share users travel routes that are significantly longer than the shortest path distance and are more likely to use local streets with low traffic and bicycle facilities. Similarly, Chen et al. [-@Chen2018] also reported that people who travel by bicycle in Seattle, Washington prefer short and flat routes with connected facilities on roads that have low traffic speeds. Their study found more variability with respect to preference for views along routes with features like mixed land use, street trees, lighting, and city features. 
+
+Cycling facilities and street connectivity have most consistently been found to be an important attribute of the built environment for promoting cycling [@yangCyclingfriendlyCityUpdated2019]. However, few studies incorporate variables at two or more spatial scales, as outlined in Moudon and Lee's [-@Moudon2003walking] framework to capture a comprehensive view of the variability in the built environment that a cyclist might encounter. Winters et al.'s [-@Winters2010] study in Vancouver, Canada is an exception, as is a recent study conducted by Cole-Hunter et al. [-@ColeHunter2015] that took some factors at the route level into account in their analysis of cycling propensity in Barcelona, Spain. Nielsen and Skov-Petersen [-@Nielsen2018] recently analyzed the influence of built environment attributes at three different scales on the probability of cycling in Copenhagen, Denmark which captured some of the spatial differentiation at which variables are important, however they did not include any route analysis. There is a need for more research to measure and understand the built environment attributes that affect cycling along different parts of the trip and at different spatial zones.
+
+# Method {#sec:method}
+
+## Spatial Interaction Models {#model}
+
+We use spatial interaction methods to analyze bicycle trip flows in Hamilton, Ontario. In the form of a gravity model, this modelling approach can account for multiple spatial zones along a cycling trip [see @Winters2010], and is therefore a more holistic approach than trip generation analysis [e.g. @deDios2011Modelling, chapter 5]. The *Transportation Tomorrow Survey* provides sufficient information to infer the zone of origin and destination of all bicycle trips in Hamilton using centroids of the traffic zones. Built environment attributes at the zone of origin and zone of destination of cycling trips can be accessed through publicly available data. Finally, new algorithms for cycle routing like *CycleStreets* now make it possible to infer route characteristics between origins and destinations, which can be considered when calculating the trip distances.
+
+Spatial interaction models operate on principles of propulsion, attraction, and the friction of space. In other words, we can assume that there are factors within a particular geographic area that contribute to producing bicycle trips, such as residential or population density, and there are factors in other geographic areas that attract them like jobs or amenities. Finally, there is the friction of space, in other words, the cost incurred in reaching a destination from an origin. Spatial interaction models are useful for estimating or explaining spatial flows in a particular system or to predict them in different scenarios.
+
+The equation of the spatial interaction model:
+$$
+U_{ij} = f(V_i, Wj, d_{ij})
+$$
+
+\noindent where $i$ represents the origin, $j$ represents the destination, $U_{ij}$ is the total interaction between origin and destination (i.e., for this analysis it is the number of bicycle trips recorded in the *TTS*), $V_i$ is a vector of attributes at the zone of origin (i.e., the push factors), $W_j$ is a vector of attributes at the zone of destination (i.e., the pull factors), and $d_{ij}$ represents the cost of making the trip (i.e., often the distance or time as a measurement of spatial separation). 
+
+Poisson regression is commonly used in the estimation of a spatial interaction model when the dependent variable is available as a count [@Chun2008; @Griffith2011; @Metulini2018]. This regression model is also suitable for datasets that contain many zero flows [@Griffith2011] as is the case where many zones of origin and destination did not generate trips. For our analysis, bicycle trip counts serve as the dependent variable and built environment or demographic attributes known to influence cycling serve as independent variables.
+
+The Poisson regression model can be written in linear form as:
+$$
+ln(\mu_{ij}) = \lambda + \lambda_O ln(V_i) + \lambda_Dln(W_j) + \beta ln(d_{ij})
+$$
+
+\noindent where $\mu_{ij}$ is the number of bicycle trips between zone of origin $i$ and zone of destination $j$, $V_i$ and $W_j$ represent the push and pull factors at $i$ and $j$ respectively, $d_{ij}$ is the cost or separation between the zone of origin and zone of destination, and $\lambda$ are estimable parameters.
+
+As highlighted by numerous studies [e.g., @Chun2008; @Metulini2018], spatial or network autocorrelation can occur in spatial interaction models, among other things, because of unobservable factors at the zone of origin or destination that are not included in the model or a misspecified cost function. Failing to account for network autocorrelation can lead to unreliable findings or misleading interpretations of the behaviour modelled [@Chun2008]. Recent papers on modelling spatial interaction have proposed the use of eigenvector spatial filtering as a way of accounting for network autocorrelation [@Chun2008; @Griffith2011; @Metulini2018]. In this respect, use of Moran's $I$ has been criticized for the case of residuals of a Poisson regression model because it is based on a normality assumption and Poisson has distributional properties that are not well known [@Chun2008]. Instead the $T$ statistic [@Jacqmin1997], is recommended for applications in spatial interaction modelling [@Chun2008; @Metulini2018]. An important assumption to note is that the residuals of the model are random and uncorrelated.
+
+## Study Area
+
+Hamilton is a growing mid-sized city located in the Greater Toronto and Hamilton Area, in Canada. The city is divided by the Niagara Escarpment, which separates the lower city and downtown core in Dundas Valley from the suburban/rural parts of the city on top of the escarpment and is approximately 100m tall in many places. The population was approximately 540,000 in 2016 at the time that the *Transportation Tomorrow Survey* was conducted, but is expected to increase by 22.9% over the coming 15 years [@Tmp2018], indicating that transportation demand will likely also grow. The city’s current Cycling Master Plan was released in 2009 to “guide the development and operation of [the city’s] cycling infrastructure for the next twenty years” [@Cmp2009, p. i] and was most recently updated in 2018 [@Cmp2018]. According to the City of Hamilton, approximately 46% of the planned city-wide cycling infrastructure, which includes on-street and off-street facilities, has been built as of 2019. Around 15 to 20 km of new cycling facilities are built each year, amounting to an annual increase of 1-2% for the entire network.  
+
+```{r context-plot, echo=FALSE, fig.cap="\\label{fig:context-plot} Wards in the city of Hamilton (Note: The smaller zones are traffic zones that generated at least one bicycle trip and are used in the analysis; black lines are provincial highways and green line is the Niagara Escarpment)"}
+ggplot(wards.sf) + 
+  geom_sf(data = hamilton_boundary) +
+  geom_sf(aes(fill = WARD), color = NA, size = 1) + 
+  geom_sf(data = hamilton, color = "white", fill = NA) +
+  geom_sf(data = streets.sf %>% 
+            dplyr::filter(ROAD_CLASS == "Provincial Highway"), 
+          size = 1) + 
+  geom_sf(data = escarpment.sf, 
+          size = 1,
+          color = "green4") +
+  theme_tufte() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+```{r trips-by-OD, include=FALSE}
+# Organize trips by origin
+
+Trips_by_Origin <- OD_table.sf %>% 
+  st_drop_geometry() %>% 
+  transmute(GTA06 = GTA06_Origin, Trips) %>%
+  group_by(GTA06) %>%
+  summarize(Trips = sum(Trips)) %>%
+  left_join(hamilton %>% 
+              transmute(GTA06 = as.character(GTA06), 
+                        geometry),
+            by = "GTA06") %>%
+  st_as_sf() %>%
+  st_transform(crs = 26917)
+```
+
+```{r retrieve-points-interest, include=FALSE}
+# Retrieve two points of interest: Hamilton Downtown and McMaster University
+points_interest <- data.frame(city = rep("Hamilton", 2), area = c("University", 
+    "Downtown"), lat = c(43.2608829, 43.2554404), lng = c(-79.9214194, -79.8753617))
+# Convert the points of interest to simple features
+(points_interest <- st_as_sf(points_interest, coords = c("lng", "lat"), remove = FALSE, 
+    crs = 4326, agr = "constant"))
+
+labels_poi <- points_interest
+
+labels_poi$geometry[[2]] <- labels_poi$geometry[[2]] + st_point(c(0.029, 0.027))
+labels_poi$geometry[[1]] <- labels_poi$geometry[[1]] + st_point(c(-0.05, -0.010))
+
+labels_lines <- rbind(points_interest, labels_poi) %>% 
+  group_by(area) %>% 
+  summarize(city = first(city)) %>% 
+  st_cast("LINESTRING")
+
+labels_poi <- points_interest
+
+labels_poi$geometry[[2]] <- labels_poi$geometry[[2]] + st_point(c(0.029, 0.03))
+labels_poi$geometry[[1]] <- labels_poi$geometry[[1]] + st_point(c(-0.05, -0.013))
+```
+
+```{r trips-by-origin, echo=FALSE, fig.cap="\\label{fig:trips-by-origin} Number of Trips Produced by Each Traffic Zone (Black lines are provincial highways and green line is the Niagara Escarpment)"}
+Trips_by_Origin %>%
+  filter(Trips > 0) %>%
+  ggplot() +
+  geom_sf(data = hamilton_boundary) +
+  geom_sf(aes(fill = Trips), color = "white") +
+  geom_sf(data = points_interest, 
+          color = "red", 
+          size = 2) +
+  geom_sf_text(data = labels_poi, 
+             aes(label = area)) +
+  geom_sf(data = labels_lines,
+          color = "red", 
+          size = 1) + 
+  geom_sf(data = streets.sf %>% 
+            filter(ROAD_CLASS == "Provincial Highway"), 
+          aes(size = ROAD_CLASS)) + 
+  geom_sf(data = escarpment.sf %>% mutate(type = "Escarpment"), 
+          aes(linetype = type),
+          color = "green4") +
+  scale_size_manual(values = c("Provincial Highway" = 1.5, "Escarpment" = 4.5)) +
+  scale_fill_distiller(direction = 1, trans = "log", breaks = c(20, 55, 148, 403, 1097)) +
+  xlim(st_bbox(Trips_by_Origin)[1], st_bbox(Trips_by_Origin)[3]) +
+  ylim(st_bbox(Trips_by_Origin)[2], st_bbox(Trips_by_Origin)[4]) +
+  theme_tufte() +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.title = element_blank())
+```
+
+## Data Sources
+
+The *Transportation Tomorrow Survey* (*TTS*) is a voluntary travel survey conducted every 5 years since 1986 to collect information about urban travel for commuting purposes in Southern Ontario [@Dmg2018tts]. The final dataset for the 2016 survey includes 6,424 completed surveys in Hamilton out of a total of 162,708 from the entire GTHA. The results from respondents in Hamilton serve as the primary dataset used in this analysis and were made available in Spring 2018. The *TTS* study employed a mixed sampling approach that was primarily address-based in response to changes in landline ownership and increasing households that only have a cell phone and no landline [@Dmg2018tts]. The survey includes sampling weights to obtain population-level values of the variables [@Dmg2018tts]. The survey was conducted between September and December 2016 online (64% of surveys completed) and by telephone (36% of surveys completed). Each participant was asked to provide household and demographic data (e.g., household size, number of vehicles, gender, etc.) and to describe all trips (e.g., origin, destination, transport mode, etc.) made the previous day by each member of the household aged 11 years or older. Trip data are aggregated for public use and the *traffic zone* is the finest level of spatial disaggregation. Hamilton has 234 traffic zones. Each traffic zone typically falls along the centre line of roads or the natural geographic boundaries, but may or may not align with municipal ward boundaries.
+
+In total, there are 13,635 bicycle trips in the 113 traffic zones within Hamilton, after the expansion factor to make it a representative sample. The trips occurred between a total of 294 origin-destination pairs. The true origins and destinations of trips are not included in the dataset, only the number of trips producted or attracted to each *traffic zone*. Although cycling increased overall in the city in recent years, levels vary across different parts of the city. The geographical context for the analysis can be seen in  Figure \ref{fig:context-plot}, which shows the Wards in the city (each Ward has an elected representative in the City Council). Wards 1, 2, and 3, which include the local university and downtown core, produce the largest numbers of trips by bicycle in Hamilton. The maximum number of bicycle trips recorded to or from a traffic zone was 365 trips. This traffic zone is located in Ward 1, which has the highest cycling mode share in the city, and predominantly features the local university. This aligns with Scott and Ciuro's [-@Scott2019factors] findings that the university is a major generator and attractor of bike share trips. Due to low density and few destinations within a bikeable distance, the majority of traffic zones located in the rural areas of the city generated 0 bicycle trips. An average of 46 bicycle trips occurred per traffic zone that produced bicycle trips. The minimum number of bicycle trips recorded in a traffic zone that produced any trips at all was 6. Of the 113 traffic zones that produced bicycle trips, about 25% produced more than 55 trips, likely zones that feature attributes that are conducive to greater cycling levels, such infrastructure or mixed land uses. 
+
+Objectively measured demographic and environmental attributes at the zones of origin and destination that might explain the production or attraction of bicycle trips were included in the model. These explanatory variables were selected based on their known or potential influence on cycling behaviour, as identified in the literature above, but also on our ability to access such data. For instance, residential density at the zone of origin might explain why trips begin there, and the number of jobs or services at the zone of destination could explain why trips end there. When possible, the datasets used for this analysis come from 2016 to match the year of the *Transportation Tomorrow Survey* results. The *2016 Canadian Census*, which is publicly available information, provided population estimates at the census tract level. Land use data was accessed from *Teranet Inc.* and The City of Hamilton's Department of Planning and Economic Development. The latter dataset defines all land parcels in the city as well as the type of land use for each parcel. The 2016 *Enhanced Points of Interest* (EPOI), produced by DMTI Spatial Inc, is a national database of over 1 million business and recreational points of interest in Canada that featured over 32,000 points of interest located in Hamilton. Finally, The City of Hamilton's *Open Data Program* offered a dataset containing the number of transit stops and the number of existing and proposed cycling infrastructure segments.
+
+## Data Preparation
+
+Hamilton's bicycle trip records were accessed in July 2019 and exported as a contingency table with the traffic zones of origin and destination of all cycling trips. The original table containing only trip information featured 294 origin-destination (O-D) pairs of traffic zones. This table was cleaned to remove 13 isolated zones, which produced trips only to neighbouring zones and not elsewhere in the city. This reduced the number of O-D pairs in our analysis from 294 to 262. Objective demographic and environmental variables were geographically organized in two different zoning systems, and areal interpolation was performed to convert census data from the tract level to traffic zones. Similarly, spatial subsetting was performed to select and organize environmental attributes based on their known coordinates and whether or not they intersected with a traffic zone. Zonal demographic and environmental variables were then joined to the origin-destination table. Table \ref{tab:variables} shows the variables that were tested in the model to measure their relative and collective influence on cycling trip flows.
+
+```{r data-sources, echo=FALSE}
+data.frame(
+  Variable = c("Population", "Points of Interest", "Bus Stops", "Infrastructure Segments", "Institutions", "Commercial", "Residential", "Full-Time Jobs", "Part-Time Jobs"),
+  Description = c(
+    "Persons residing in each traffic zone (1,000s)",
+    "Points of interest (e.g., health care and educational facilities, restaurants, etc.) per traffic zone  (1,000s)", 
+    "Municipal bus stops per traffic zone  (100s)",
+    "Existing and proposed cycling infrastructure segments (100s)",
+    "Institutions (e.g., schools, places of worship, government, etc.) per traffic zone  (1,000s)",
+    "Commercial locations (e.g., general retail, recreation, and sports clubs, etc.) per traffic zone (1,000s)", 
+    "Residences (e.g., detached house, semi-detached house, apartment, etc.) per traffic zone (1,000s)",
+    "Persons employed full-time, outside of the home, by zone of employment (1,000s)",
+    "Persons employed part-time, outside of the home, by zone of employment (1,000s)"
+  ),
+  Source = c("2016 Canadian Census", "DMTI Spatial Inc.", "City of Hamilton Open Data", "City of Hamilton Open Data", "Teranet Inc., Hamilton Parcel/Land Use Data", "Teranet Inc., Hamilton Parcel/Land Use Data", "Teranet Inc., Hamilton Parcel/Land Use Data", "Transportation Tomorrow Survey", "Transportation Tomorrow Survey")
+) %>%
+  kable("latex",
+        booktabs = T,
+        caption = "\\label{tab:variables}Demographic and Built Environment Variables Used in the Analysis") %>%
+  kable_styling(latex_options = c("scale_down", "striped"),
+                font_size = 9)  %>%
+  column_spec(1, italic = T, border_right = T) %>%
+  column_spec(2, width = "30em") %>%
+  column_spec(3, border_left = T)
+```
+
+In addition to the variables in Table \ref{tab:variables}, dummy variables were created to account for Hamilton's topography. Traffic zones were classified by geographic area, namely zones in the lower city and zones in the Niagara Escarpment or the suburban/rural parts of the city. This classification was used to code O-D pairs that were in the same different geographical classes, to capture that a cyclist would need to navigate changes in elevation and natural features when travelling across different topographies in Hamilton. If both the zone of origin and zone of destination were in the lower city, this pair was labelled with 0. If the origin and destination were in different regions (i.e., lower city and escarpment/rural), the pair was labelled with 1. If both zones were in the escarpment or rural areas, the pair was labelled with 2.
+
+## Inferring Cycle Routes
+
+The *Transportation Tomorrow Survey* does not ask respondents to state the routes that they travel, so this information is unknown. For this reason, we have to infer routes using the centroids of each traffic zone polygon as a start or end point, which are then included as a cost function in the model. We use a novel routing service, *CycleStreets*\footnote{https://www.cyclestreets.net/}, to this end. The algorithm relies on data that is publicly available through *OpenStreetMap*, so there are additional objectively measured environmental variables captured in the cost function. This can potentially provide more information about trip distribution than using only the shortest-path distance. The algorithm infers three different types of routes: *fastest*, *quietest*, and *balanced*. The `R` package\footnote{https://cran.r-project.org/web/packages/cyclestreets/cyclestreets.pdf} used in this analysis states: "These represent routes taken to minimize time, avoid traffic, and compromise between the two, respectively" [@Lovelace2018, p. 1]. The *CycleStreets* algorithm rates the *quietness* as a score, with routes featuring cycle tracks and park paths rated as the quietest, and then decreasing to varying degrees of quietness depending on the extent that cyclists would have to interact with other users of the road on\footnote{https://www.cyclestreets.net/help/journey/howitworks/\#quietness}. 
+With respect to the algorithm, the documentation explains that routes with shared facilities rate relatively high and busy roads have the lowest score. Overall, the algorithm tries to minimize the *busyness* of a route but there is a lack of transparency with respect to the rate of speed used for calculating the time of each route and which specific attributes are considered by the algorithm when minimizing *busyness*. Quietness scores are adjusted based on feedback from users\footnote{\url{https://www.cyclestreets.net/help/journey/howitworks/}}, and therefore include what might be considered expert opinion. The scores are used to determine whether a route is *fastest*, *balanced*, or *quietest*. The distance and time on each leg of a route can be obtained from the algorithm, and from these, the total travel distance and time for each type of route between origin and destination can be calculated. 
+
+Testing each type of route as an impedance factor in the model yields six different cost variables for each origin-destination pair (i.e., $fastest-distance$, $fastest-time$, $quietest-distance$, $quietest-time$, $balanced-distance$, and $balanced-time$). For the sake of comparison, we also include the simplest measure of cost, which is the Euclidean distance between origin-destination centroids (or Euclidean time, the time that it would take to travel that distance on a straight line, assuming a speed of 22.5 km/h). Each of these variables were incorporated into the spatial interaction model to test which cost variable best explains cycling flows in Hamilton. Table \ref{tab:routes} offers descriptive statistics of the different types of routes, after removing intrazonal trips. Table \ref{tab:detours} includes the average detour of the quietest and balanced routes compared to the Euclidean distance. The detour is defined as the ratio of the distance (or time) on the route to the Euclidean distance (or time) for the same origin-destination pair. For example, a detour of 1.5 means that the route is 50% longer than the corresponding Euclidean metric. 
+
+```{r route-sources, echo=FALSE}
+data.frame(
+  Route = c(
+    "Euclidean Distance (km)",
+    "Euclidean Time (min)",
+    "Quietest Distance (km)", 
+    "Quietest Time (mins)", 
+    "Balanced Distance (km)", 
+    "Balanced Time (mins)", 
+    "Fastest Distance (km)", 
+    "Fastest Time (mins)"), 
+  Minimum = c(
+    "0.318",
+    "0.8461",
+    "0.412",
+    "1.617", 
+    "0.412",
+    "1.617",
+    "0.412",
+    "1.617"),
+  Quartile.1 = c(
+    "3.387",
+    "9.0188",
+    "4.950",
+    "22.725",
+    "4.829",
+    "20.837",
+    "4.851",
+    "20.038"),
+  Median = c(
+    "5.508",
+    "14.668",
+    "7.944",
+    "37.817",
+    "7.688",
+    "34.825",
+    "7.715",
+    "32.975"),
+  Mean = c(
+    "5.924",
+    "15.775",
+    "8.293",
+    "40.572",
+    "8.127",
+    "36.752",
+    "8.179",
+    "34.612"),
+  Quartile.3 = c(
+    "7.950",
+    "21.172",
+    "11.085",
+    "54.683",
+    "10.784",
+    "49.462",
+    "10.834",
+    "46.783"),
+  Max = c(
+    "19.631",
+    "52.279",
+    "25.523",
+    "133.117",
+    "24.908",
+    "124.567",
+    "24.865",
+    "110.300"),
+  SD = c(
+    "3.367",
+    "8.968",
+    "4.419",
+    "4.373",
+    "4.424",
+    "23.091",
+    "20.376",
+    "18.788")
+) %>%
+  kable("latex",
+        booktabs = T,
+        caption = "\\label{tab:routes}Descriptive Statistics of Inferred Routes by CycleStreets") %>%
+  kable_styling(latex_options = c("scale_down", "striped"),
+                font_size = 9)  %>%
+  column_spec(1, italic = T, border_right = T) %>%
+  column_spec(2, width = "5em") %>%
+  column_spec(3, border_left = T)
+```
+
+```{r, echo=FALSE}
+data.frame(
+  Route = c(
+    "Quietest Distance (km)", 
+    "Quietest Time (mins)", 
+    "Balanced Distance (km)", 
+    "Balanced Time (mins)"), 
+  Min = c(
+    "0.9861",
+    "1.058", 
+    "0.9861",
+    "1.058"),
+  Quartile.1 = c(
+    "1.2782",
+    "2.108",
+    "1.2574",
+    "1.960"),
+  Median = c(
+    "1.3971",
+    "2.403",
+    "1.3794",
+    "2.182"),
+  Mean = c(
+    "1.4388",
+    "2.661",
+    "1.4064",
+    "2.421"),
+  Quartile.3 = c(
+    "1.5187",
+    "2.982",
+    "1.4893",
+    "2.689"),
+  Max = c(
+    "5.4321",
+    "15.943",
+    "5.4149",
+    "15.791")
+) %>%
+  kable("latex",
+        booktabs = T,
+        caption = "\\label{tab:detours}Descriptive Statistics of Average Detour of Inferred Routes by CycleStreeets Compared to Euclidean Distance") %>%
+  kable_styling(latex_options = c("scale_down", "striped"),
+                font_size = 9)  %>%
+  column_spec(1, italic = T, border_right = T) %>%
+  column_spec(2, width = "5em") %>%
+  column_spec(3, border_left = T)
+```
+
+As seen in Tables \ref{tab:routes} and \ref{tab:detours} *quietest* distance routes and *quietest* time routes are longer than the *balanced* and *fastest* route counterparts, but not by much. Most of the *quietest* distance routes are also 50% longer than the Euclidean distance. 
+
+# Results {#sec:results}
+
+## Spatial Interaction Models Considered
+
+Four spatial interaction models were estimated with bicycle flows between zones of origin and destination as the dependent variable. Various combinations of zonal attributes and the distance or time of inferred cycle routes between origins and destinations were experimented with. Each of these models went through a general-to-particular variable selection process. Starting with models that included all zonal attributes in Table \ref{tab:variables}, variables that did not meet a significance criterion of $p \le 5$% were removed to obtain a more parsimonious model. For comparison purposes, a base model with a constant only was estimated to serve as a benchmark. This was followed by a model with only zonal attributes (i.e., push-pull factors), then a model only with cost variables (time or distance of different inferred routes), and then finally a full model with zonal and cost variables. The selection of initial variables for each model was deliberate and meant to investigate the performance of models that considered only certain aspects of the spatial interaction process. The models are described next and the results are presented in Table \ref{tab:all-models}. 
+
+```{r base-model, include=FALSE, fig.cap="\\label{fig:model-0} Model with Constant Only"}
+#Model with constant only
+model0 <- zelig(Trips ~ 1,
+                model = "poisson",
+                data = OD_table.sf,
+                cite = FALSE)
+#summary(model0)
+```
+
+```{r t-test-base-model, include=FALSE}
+model0_gadda <- t.test.gadda(model0, hamilton_listw_net)
+```
+
+### Model 1: Zonal Attributes Only
+
+After the benchmark non-informative model, the first estimated spatial interaction model included zonal attributes as explanatory variables that might explain the production or attraction of bicycle trips but did not include a cost variable. These were the variables that met the significance criterion of $p \le 5$% in the general-to-particular variable selection process. Therefore, this model did not include the second spatial zone of the behavioral model of the environment.
+
+```{r model-1, include=FALSE, fig.cap="\\label{fig:model-1} Model with Zonal Attributes Only"}
+# Model with zonal attributes
+model1 <- zelig(Trips ~ Population.o +
+                  Points_of_Interest.o +
+                  Institutions.o + 
+                  Commercial.o +
+                  Industry.o +
+                  Office.o +
+                  Residential.o +
+                  BusStops.o +
+                  BikeInfra.o +
+                  Population.d +
+                  Institutions.d +
+                  Commercial.d +
+                  Industry.d +
+                  Office.d +
+                  Residential.d +
+                  BusStops.d +
+                  BikeInfra.d +
+                  Full_time_jobs.d + 
+                  Part_time_jobs.d,
+                model = "poisson",
+                data = OD_table.sf,
+                cite = FALSE)
+summary(model1)
+```
+
+```{r t-test-model-1, include=FALSE}
+model1_gadda <- t.test.gadda(model1, hamilton_listw_net)
+```
+
+### Model 2: Cost Variables Only
+
+This model used only cost variables, which included our geographical classes for the zones. In other words, this model includes only attributes of the second spatial zone of the *behavioral model of the environment*, namely the different inferred routes. We estimated this model with one cost variable at a time (e.g., topography and *fastest* distance, topography and *quietest* time, and so forth) which allowed for the comparison of how distance or time along specific inferred routes performed in each model.
+
+```{r model-2, include=FALSE, fig.cap="\\label{fig:model-2} Model with Cost Only"}
+# Model with cost only
+model2 <- zelig(Trips ~ 
+                  Topography +
+                  #euclidean_distance,
+                  #fastest_distance,
+                  #fastest_time,
+                  quietest_distance,
+                  #quietest_time,
+                  #balanced_distance,
+                  #balanced_time,
+                 model = "poisson",
+                 data = OD_table.sf, 
+                 cite = FALSE)
+summary(model2)
+```
+
+```{r include=FALSE}
+aic_mod2 <- data.frame(Cost_Variable = factor(c("Euclidean Distance", 
+                                         "Fastest Distance",
+                                         "Fastest Time",
+                                         "Quietest Distance",
+                                         "Quietest Time",
+                                         "Balanced Distance",
+                                         "Balanced Time"), 
+                                         levels = c("Euclidean Distance", 
+                                         "Fastest Distance",
+                                         "Fastest Time",
+                                         "Quietest Distance",
+                                         "Quietest Time",
+                                         "Balanced Distance",
+                                         "Balanced Time")),
+                       AIC = c(71514, 71839, 71969, 71307, 71589, 71647, 71979))
+```
+
+```{r t-test-model-2, include=FALSE}
+model2_gadda <- t.test.gadda(model2, hamilton_listw_net)
+```
+
+### Model 3: Full Model
+
+In the final model, we combined the variables used in Models 1 and 2, to include both zonal attributes and the cost function. This model includes zonal attributes that might explain the production or attraction of bicycle trips, topography classification, and measures of cost from inferred routes. Just like Model 2, we estimated this model using each cost variable at the time (i.e., all zonal attributes with *fastest* distance as cost, and so forth).
+
+```{r full-model, include=FALSE, fig.cap="\\label{fig:model-3} Full Model"}
+# Full SI model
+model3 <- zelig(Trips ~ Population.o +
+                  Points_of_Interest.o +
+                  Institutions.o + 
+                  Commercial.o +
+                  Industry.o +
+                  Office.o +
+                  Residential.o +
+                  BusStops.o +
+                  BikeInfra.o +
+                  Population.d + 
+                  Institutions.d +
+                  Commercial.d +
+                  Industry.d +
+                  Office.d +
+                  Residential.d +
+                  BusStops.d +
+                  BikeInfra.d +
+                  Full_time_jobs.d + 
+                  Part_time_jobs.d +
+                  Topography +
+                  #euclidean_distance,
+                  #fastest_distance,
+                  #fastest_time,
+                  quietest_distance,
+                  #quietest_time,
+                  #balanced_distance,
+                  #balanced_time,
+                 model = "poisson",
+                 data = OD_table.sf, 
+                 cite = FALSE)
+summary(model3)
+```
+
+```{r include=FALSE}
+aic_mod3 <- data.frame(Cost_Variable = factor(c("Euclidean Distance", 
+                                         "Fastest Distance",
+                                         "Fastest Time",
+                                         "Quietest Distance",
+                                         "Quietest Time",
+                                         "Balanced Distance",
+                                         "Balanced Time"), 
+                                         levels = c("Euclidean Distance", 
+                                         "Fastest Distance",
+                                         "Fastest Time",
+                                         "Quietest Distance",
+                                         "Quietest Time",
+                                         "Balanced Distance",
+                                         "Balanced Time")),
+                       AIC = c(63127, 63365, 63521, 62973, 63132, 63357, 63541))
+```
+
+```{r t-test-model-3, include=FALSE}
+model3_gadda <- t.test.gadda(model3, hamilton_listw_net)
+```
+
+## Model Results
+
+Akaike's information criterion ($AIC$) is used to compare the various models. The model with the lowest $AIC$ is selected as the model that minimizes information loss, while considering parsimony of the specification. In addition, $AIC$ is used in the calculation of the relative likelihood, which is defined as:
+$$
+e^{\frac{AIC_{min} - AIC_i}{2}}
+$$
+
+In the above, $AIC_{min}$ is the $AIC$ of the model that minimizes this criterion, and $AIC_i$ is the $AIC$ of a competing model. This is measure of of goodness of fit is interpreted as the probability that the competing model minimizes information loss to the same extent as the best model. It is important to note that although comparison of $AIC$ from a set of models indicates the model with the best fit, it does not reveal any information about the quality of each model, which is why analysis of the residuals is important as well.
+
+Table \ref{tab:model-comparison} presents a summary of the goodness of fit of the models. For reference, the $AIC$ of the base model is 95,808 and the $AIC$ of Model 1 is 83,995. Model 1 is a significantly better fit than the base model, which indicates the explanatory power of zonal attributes as independent variables. Interestingly, as seen in the table, the use of cost as in Model 2, provides much higher explanatory power than zonal attributes. Of the different cost variables, distance along *quietest* routes is the cost variable that leads to the best fit, a result that is replicated in Model 3. An obvious limitation of Model 2 is that it lacks variables that might ultimately explain what is producing or attracting bicycle trips from each traffic zone. Our full model, Model 3, includes variables that might explain trips and cost variables, which ultimately provides the best fit of all models considered. As seen in Table \ref{tab:model-comparison}, Model 3 with distance along inferred *quietest* routes provides a significantly better fit than any of the competing models, and the relative likelihood (calculated with respect to this model) indicates that the probability that any of the alternative models minimizes the information loss to the same extent is practically zero.
+
+```{r model-comparison, echo=FALSE}
+data.frame(Cost_Variable = factor(c("Euclidean Distance", 
+                                         "Fastest Distance",
+                                         "Fastest Time",
+                                         "Quietest Distance",
+                                         "Quietest Time",
+                                         "Balanced Distance",
+                                         "Balanced Time"), 
+                                         levels = c("Euclidean Distance", 
+                                         "Fastest Distance",
+                                         "Fastest Time",
+                                         "Quietest Distance",
+                                         "Quietest Time",
+                                         "Balanced Distance",
+                                         "Balanced Time")),
+                      mod2 = aic_mod2$AIC,
+                      mod3 = aic_mod3$AIC) %>%
+  mutate(mod2_relative_lk = c(exp((aic_mod3$AIC[4] - aic_mod2$AIC)/2)),
+         mod3_relative_lk = c(exp((aic_mod3$AIC[4] - aic_mod3$AIC)/2)),
+         mod2_relative_lk = ifelse(mod2_relative_lk < 0.0001, "<0.0001", round(mod2_relative_lk, 4)),
+         mod3_relative_lk = ifelse(mod3_relative_lk < 0.0001, "<0.0001", round(mod3_relative_lk, 4))) %>%
+  select(Cost_Variable, mod2, mod2_relative_lk, mod3, mod3_relative_lk) %>%
+  kable("latex",
+        booktabs = T,
+        col.names = c("Cost Variable", 
+                      "AIC", "Relative Likelihood", "AIC", "Relative Likelihood"),
+        align = c("l", "c", "c", "c", "c"),
+        caption = "\\label{tab:model-comparison} Model Comparison: AIC and Relative Likelihood") %>%
+    add_header_above(c("", "Model 2" = 2, "Model 3" = 2)) %>%
+    kable_styling(latex_options = c("scale_down", "striped")) %>%
+  footnote(general = c("Relative likelihood is calculated with respect to Model 3:Quietest Distance"))
+  
+```
+
+The results of the models are presented in Table \ref{tab:all-models}. In addition to their goodness of fit, each of the models was tested for network autocorrelation, using Jacqmin-Gadda's $T$ statistic [@Jacqmin1997; @Chun2008; @Metulini2018]. Network autocorrelation is, in addition to a violation of the independence assumption, an indication of a model that is misspecified (either the functional form in incorrect or there are relevant variables that were omitted). 
+
+It is worth noting that the only model without residual network autocorrelation is Model 3, which signifies that this model not only provides the best fit but it is also the only one that is free from network autocorrelation. As described above, testing for network autocorrelation in a spatial interaction model is a diagnostic tool. When no network autocorrelation is detected in the residuals of the model, this is a sign that all systematic variation has been accounted for with the variables included in the model. The model can be considered a *sufficient* explanation of the pattern observed. We discuss the results of the analysis next.
+
+```{r all-models, results= "asis", echo=FALSE}
+# Retrieve results of all models
+results0 <- texreg::extract(model0) 
+results1 <- texreg::extract(model1)
+results2 <- texreg::extract(model2)
+results3 <- texreg::extract(model3)
+
+# Organize individual model results in dataframes
+summary0.df <- data.frame(Estimate = c(results0@coef), 
+                          pvalue = c(results0@pvalues)) %>%
+  rownames_to_column() %>%
+  mutate(rowname = "(Intercept)")
+
+summary1.df <- data.frame(Estimate = c(results1@coef), 
+                          pvalue = c(results1@pvalues)) %>%
+  rownames_to_column()
+
+summary2.df <- data.frame(Estimate = c(results2@coef), 
+                          pvalue = c(results2@pvalues)) %>%
+  rownames_to_column()
+
+summary3.df <- data.frame(Estimate = c(results3@coef), 
+                          pvalue = c(results3@pvalues)) %>%
+  rownames_to_column()
+
+# Join results of all models
+summary.df <- summary0.df %>% full_join(summary1.df, 
+                                        by = "rowname") %>%
+  full_join(summary2.df,
+            by = "rowname") %>%
+  full_join(summary3.df,
+            by = "rowname") %>%
+  rename(Variable = rowname, 
+         Estimate0 = Estimate.x, pvalue0 = pvalue.x,
+         Estimate1 = Estimate.y, pvalue1 = pvalue.y,
+         Estimate2 = Estimate.x.x, pvalue2 = pvalue.x.x,
+         Estimate3 = Estimate.y.y, pvalue3 = pvalue.y.y) %>%
+  mutate(Estimate0 = case_when(!is.na(Estimate0) ~ paste(round(Estimate0, 4))), 
+         pvalue0 = ifelse(pvalue0 < 0.0001, "< 0.0001", round(pvalue0, 4)),
+         Estimate1 = case_when(!is.na(Estimate1) ~ paste(round(Estimate1, 4))), 
+         pvalue1 = ifelse(pvalue1 < 0.0001, "< 0.0001", round(pvalue1, 4)),
+         Estimate2 = case_when(!is.na(Estimate2) ~ paste(round(Estimate2, 4))), 
+         pvalue2 = ifelse(pvalue2 < 0.0001, "< 0.0001", round(pvalue2, 4)),
+         Estimate3 = case_when(!is.na(Estimate3) ~ paste(round(Estimate3, 4))), 
+         pvalue3 = ifelse(pvalue3 < 0.0001, "< 0.0001", round(pvalue3, 4))) %>%
+  replace_na(list(Estimate0 = " ", pvalue0 = " ",
+                  Estimate1 = " ", pvalue1 = " ",
+                  Estimate2 = " ", pvalue2 = " ",
+                  Estimate3 = " ", pvalue3 = " "))
+
+# Collect model diagnostics
+model_diagnostics <- data.frame(Variable = c("Jacqmin-Gadda z(T)",
+                                             "n =",
+                                             "log-likelihood =",
+                                             "AIC = ",
+                                             "Relative likelihood = "),
+                                Estimate0 = c(round(model0_gadda$z, 4),
+                                              " ",
+                                              " ",
+                                              " ",
+                                              " "),
+                                pvalue0 = c(ifelse(model0_gadda$pvalue < 0.0001, 
+                                                   "p < 0.0001", 
+                                                   paste("p = ", round(model0_gadda$pvalue, 4))),
+                                            as.character(round(results0@gof[5], digits = 4)),
+                                            as.character(round(results0@gof[3], digits = 4)),
+                                            as.character(round(results0@gof[1], digits = 4)),
+                                            ifelse(exp((results3@gof[1] - results0@gof[1])/2) < 0.0001, 
+                                                   "< 0.0001", 
+                                                   round(exp((results3@gof[1] - results0@gof[1])/2),
+                                                         4))),
+                                Estimate1 = c(round(model1_gadda$z, 4),
+                                              " ",
+                                              " ",
+                                              " ",
+                                              " "),
+                                pvalue1 = c(ifelse(model1_gadda$pvalue < 0.0001, 
+                                                   "p < 0.0001", 
+                                                   paste("p = ", round(model1_gadda$pvalue, 4))),
+                                            as.character(round(results1@gof[5], digits = 4)),
+                                            as.character(round(results1@gof[3], digits = 4)),
+                                            as.character(round(results1@gof[1], digits = 4)),
+                                            ifelse(exp((results3@gof[1] - results1@gof[1])/2) < 0.0001, 
+                                                   "< 0.0001", 
+                                                   round(exp((results3@gof[1] - results1@gof[1])/2),
+                                                         4))),
+                                Estimate2 = c(round(model2_gadda$z, 4),
+                                              " ",
+                                              " ",
+                                              " ",
+                                              " "),
+                                pvalue2 = c(ifelse(model2_gadda$pvalue < 0.0001, 
+                                                   "p < 0.0001", 
+                                                   paste("p = ", round(model2_gadda$pvalue, 4))),
+                                            as.character(round(results2@gof[5], digits = 4)),
+                                            as.character(round(results2@gof[3], digits = 4)),
+                                            as.character(round(results2@gof[1], digits = 4)),
+                                            ifelse(exp((results3@gof[1] - results2@gof[1])/2) < 0.0001, 
+                                                   "< 0.0001", 
+                                                   round(exp((results3@gof[1] - results2@gof[1])/2),
+                                                         4))),
+                                Estimate3 = c(round(model3_gadda$z, 4),
+                                              " ",
+                                              " ",
+                                              " ",
+                                              " "),
+                                pvalue3 = c(ifelse(model3_gadda$pvalue < 0.0001, 
+                                                   "p < 0.0001", 
+                                                   paste("p = ", round(model3_gadda$pvalue, 4))),
+                                            as.character(round(results3@gof[5], digits = 4)),
+                                            as.character(round(results3@gof[3], digits = 4)),
+                                            as.character(round(results3@gof[1], digits = 4)),
+                                            ifelse(exp((results3@gof[1] - results3@gof[1])/2) < 0.0001, 
+                                                   "< 0.0001", 
+                                                   round(exp((results3@gof[1] - results3@gof[1])/2),
+                                                         4))))
+
+# Join model results and diagnostics
+summary.df <- rbind(summary.df, 
+                    model_diagnostics)
+
+# Create table
+kable(summary.df, 
+      "latex", 
+      digits = 4, 
+      booktabs = T,
+      col.names = c("Variable", "Estimate", "p-value", "Estimate", "p-value", "Estimate", "p-value", "Estimate", "p-value"),
+      align = c("l", "c", "c", "c", "c", "c", "c", "c", "c"),
+      caption = "\\label{tab:all-models} Results of the Models") %>%
+  add_header_above(c("", "Base Model" = 2, "Model 1" = 2, "Model 2" = 2, "Model 3" = 2)) %>%
+  kable_styling(latex_options = c("scale_down", "striped"))  %>% 
+  pack_rows("Model diagnostics", 24, 28, latex_gap_space = "2em") %>%
+  footnote(general = c("Jacqmin-Gadda $T$ is converted to a $z$-score",
+                       "Relative likelihood is calculated with respect to Model 3"),
+           escape = FALSE) %>%
+  landscape()
+```
+
+```{r echo=FALSE}
+OD_table.sf$Estimated_Trips <- unlist(fitted(model3))
+OD_table.sf$residuals <- unlist(residuals(model3))
+```
+
+```{r fig-residuals-best-model, eval = FALSE, echo = FALSE, fig.cap="\\label{fig:residuals-best-model} Count of Residuals for Best Model"}
+# THIS FIGURE IS NOT REFERRED TO IN THE TEXT
+
+ggplot(data = OD_table.sf, aes(x = residuals)) +
+  geom_histogram(bins = 25) +
+  ggtitle("Residuals from Model 3") +
+  xlab("Residual") +
+  ylab("Count")
+```
+
+# Discussion {#sec:discussion}
+
+## Best Fit Model
+
+Model 3 reveals that several built environment attributes at the zones of origin and destination produce or attract bicycle trips in Hamilton, Ontario. Points of interest and commercial and office locations at the zone of origin had a negative influence on the number of expected bicycle trips. This is as expected: more destinations or amenities at the origin create more intervening opportunities that ultimately reduce the need to travel to other areas. Although population density has been found to influence cycling trips in several studies [e.g., @Nielsen2018; @Nordengen2019; @Schneider2015; @Winters2010], in our analysis we find a negative effect of population density in terms of both producing and attracting trips by bicycle. Scott and Ciuro similarly found that population density around bike share hubs in Hamilton does not influence ridership [@Scott2019factors]. It is possible that this is due to the relatively low population density of Hamilton in general. In contrast, availability of jobs at the destination was a positive attractor of bicycle trips. The model also uncovered a positive relationship between number of trips and different land uses at the destination: institution, industry, office, residential locations. This reflects an abundance of amenities and diversity of jobs, as well as the reciprocal trip flow to return to one's residence. Geographical classification of the zones was found to have a negative relationship with the number of bicycle trips. This suggests relatively little interaction between the two broad regions in the city, namely lower city and escarpment/suburban/rural, and also lower interaction within the escarpment/suburban/rural compared to the lower city. The presence of the Niagara Escarpment, in particular, echoes other studies that have found that elevation at the destination or changes in slope can deter travel by bicycle [e.g., @Broach2012; @ColeHunter2015]. In the case of Hamilton, the Escarpment is a significant change in slope. The physical cost of travelling up and down an escarpment, in addition to longer trip distances, can help to explain why there are few trips between the two distinct areas of the city.
+
+## Inferred Routes
+
+The model reveals that the *quietest* routes that allow cyclists to minimize distance *and* interactions with other road users best explain the pattern of travel by bicycle in Hamilton. This suggests that people who travel by bicycle in Hamilton likely seek out routes that are less busy with car traffic instead of more direct routes. This finding is consistent with previous research that used GPS data to reveal the route preferences of cyclists in Hamilton [@Lu2018understanding]. After *quietest* distance, *quietest* time was the closest competitor. After the identified *quietest* routes, there was relatively little difference between using *balanced* distance and *fastest* distance as a measure of spatial separation in the model. Intuitively, it makes sense that these two measures would have similar goodness of fit since they both involve greater mixing with traffic. If traffic interactions cannot be avoided, then taking the fastest shortest path route to arrive at the destination would likely be the next best option for many. 
+
+Inferring the route travelled between zones of origins and destination using routing algorithms is an important method to account for route characteristics in the analysis of trip distribution, and the second spatial zone of the *behavioral model of the environemnt*. It is also useful given that such data about routes is not available from travel surveys, including the *Transportation Tomorrow Survey*. Other studies have used GIS [@ColeHunter2015; @Winters2010], GPS data [@Chen2018; @Dill2009; @Lu2018understanding; @SkovPetersen2018], or new methods using crowd-sourced data [@McArthur2019; @Sarjala2019] to measure or approximate the built environment along routes travelled by cyclists. However, GPS data are typically available only for small samples or under limited conditions, such as with bike share trips in Hamilton [@Lu2018understanding], that may not cover the full geographical extent of travel by bicycle in a region. To the best of our knowledge, this is the first North American study that uses the *CycleStreets* algorithm in combination with travel survey data to infer routes in the analysis of cycling trip flows. As previously noted, the differences between *quietest* routes and *balanced*/*fastest* routes are relatively small. The fact that the goodness of fit of the models using the *quietest* routes is significantly better suggests that there might be other factors at the micro-level of the routes that may influence cycling differently between these routes. This leaves open the question whether routes inferred by *CycleStreets* have attributes that support cycling, such as infrastructure or enjoyable environments, in addition to less *busyness*. Despite the lack of transparency about certain aspects of the algorithm (in particular the expert input used to modify the *quietness* scores), in the experience of the authors the algorithm makes overall sensible recommendations for *quietest* routes. While we cannot know with complete certainty which routes were actually used by individual cyclists, by exploring different types of routes in our models we are able to provide statistical support for *quietest* routes that minimize distance - a finding in line with bicycle-share results reported by Lu et al. [-@Lu2018understanding].
+
+```{r echo=FALSE}
+data.frame(
+  Characteristics = c("% Trip Flows >= 10 km", "% Trip Flows >= 5 km", "% Trip Flows <= 5 km", "% Trip Flows <= 2.5 km", "% Trip Flows Rural/Escarpment to Lower City", "% Trip Flows Lower City to Rural/Escarpment", "% Trip Flows Only Rural/Escarpment", "% Trip Flows Only Lower City", "% Trip Flows <= 2.5 km in Lower City", "% Trip Flows <= 5 km in Lower City", "% Trip Flows >= 5 km in Lower City", "% Trip Flows <= 2.5 km in Rural/Escarpment Area", "% Trip Flows <= 5 km in Rural/Escarpment Area", "% Trip Flows >= 5 km in Rural/Escarpment Area"),
+  Percentage = c("4.6%", "21.4%", "78.6%", "48.5%", "1.9%", "1.9%", "16.8%", "79.4%", "52.4%", "80.8%", "19.2%", "40.9%", "86.4%", "13.6%")
+) %>%
+  knitr::kable("latex",
+        booktabs = T,
+      caption = "\\label{tab:flow-descriptives}Bicycle Trip Flow Characteristics According to Quietest Distance Routes") %>%
+  kable_styling(latex_options = c("striped"),
+                font_size = 9) %>%
+  column_spec(1, italic = T, border_right = T) %>%
+  column_spec(2, width = "5em", border_right = T)
+```
+
+## Analysis of Residuals
+
+The best model minimized information loss conditional on the independent variables. Informed by the work of Moniruzzaman and Páez [-@Moniruzzaman2012] with walking trips in Hamilton, we were curious to examine in more detail over- and under-estimated trip flows. There were a total of 4 over-estimated trip flows and 256 under-estimated trip flows. Since the model is not Gaussian, there is no assumption that the distribution of the residuals will be symmetric. We hypothesize that discrepancies between the number of observed trips and the number of expected trips are due to the built environment, namely attributes along the *quietest* distance route that might influence cycling but that we were not able to capture in the model. With respect to over-estimated trip flows, there may be barriers along the inferred cycle route between zone of origin and destination that deter cyclists from travelling. The opposite may be true for under-estimated trip flows. It is worth noting first that the majority of trip flows were under-estimated which indicates, to some extent, that there is more cycling in Hamilton than predicted by the model. This suggests that route characteristics that influence cycling may be influential. We provide a qualitative description of these trip flows next.
+
+By plotting the negative residuals from the best model, after removing all origin-destination (OD) pairs with zero trips, bicycle trip flows that were over-estimated were visualized in Figure \ref{fig:residuals-overestimated}. There were only 4 trip flows, 3 of which represent travel in a westward direction. The zone of destination for 3 of the 4 trip flows includes the university which is a major employment and educational institution, and thus acts as a strong push and pull factor for trips. This was identified with bike share trips in Hamilton as well [@Scott2019factors]. Schneider et al. [-@Schneider2015] also found that neighbourhoods with high levels of commute trips by bicycle are located near to a university campus. This suggests that universities can attract a large number of trips. Upon further investigation, the *Enhanced Points of Interest* dataset catalogues each different building and unit within the university, meaning that there are several hundred destinations within the traffic zone. The count may have skewed the relative influence of the university by indicating more potential destinations, instead of one institution, leading to over-estimation. The zone of destination for the other trip flow was also near the university, however the over-estimation was almost negligible. When analyzing the *quietest* distance routes for the O-D pairs that end at the traffic zone with the university, each route would require a cyclist to cross a major highway or travel along an arterial road. At the route level, road networks with fewer highways or arterial roads have been found to increase the likelihood of making a trip by bicycle [@Winters2010; @Zhao2014]. Although we were able to provide statistical support for *quietest* routes that minimize distance, there are still roads and intersections in Hamilton that cannot be avoided and that still feature along routes that are less busy overall.
+
+```{r residuals-over, echo = FALSE, fig.cap="\\label{fig:residuals-overestimated} Map of Over-predicted Bicycle Trip Flows (Black lines are provincial highways and green line is the Niagara Escarpment)"}
+ggplot(data = hamilton) +
+  geom_sf(data = hamilton_boundary) +
+  geom_sf(fill = NA, color = "white") +
+  geom_sf(data = OD_table.sf %>% 
+            filter(Trips != 0, 
+                   residuals <= 0, 
+                   GTA06_Origin != GTA06_Destination),
+          aes(color = residuals),
+          size = 2) +
+    scale_color_distiller(palette = "OrRd") +
+  geom_sf(data = points_interest, 
+          color = "red", 
+          size = 2) +
+  geom_sf_text(data = labels_poi, 
+             aes(label = area)) +
+  geom_sf(data = labels_lines,
+          color = "red", 
+          size = 1) + 
+ geom_sf(data = streets.sf %>% 
+            filter(ROAD_CLASS == "Provincial Highway"), 
+          aes(size = ROAD_CLASS)) + 
+  geom_sf(data = escarpment.sf %>% mutate(type = "Escarpment"), 
+          aes(linetype = type),
+          color = "green4") +
+  scale_size_manual(values = c("Provincial Highway" = 1.5, "Escarpment" = 4.5)) +
+  xlim(st_bbox(Trips_by_Origin)[1], st_bbox(Trips_by_Origin)[3]) +
+  ylim(st_bbox(Trips_by_Origin)[2], st_bbox(Trips_by_Origin)[4]) +
+  theme_tufte() +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.title = element_blank())
+```
+
+Similarly, by plotting the positive residuals, after removing all origin-destination pairs with zero trips, bicycle trip flows that were under-estimated were visualized in Figure \ref{fig:residuals-underestimated}. Given that the majority of trip flows were under-estimated, we visualized trip flows in different maps according to their characteristics. Figure \ref{fig:residuals-over-5km} shows a map of trip flows over 5 km and Figure \ref{fig:residuals-under-5km} shows trip flows under 5 km. One fifth of under-estimated trip flows, approximately 21%, had a *quietest* distance route between 5 and 25 kilometres. Trip distance is an important determinant of cycling for transport [@heinenCommutingBicycleOverview2010], which suggests that the distance between origin and destination could be the reason that these flows were under-estimated. Furthermore, approximately 17% of under-estimated trip flows occurred within the suburban neighbourhoods on the Niagara Escarpment. Fewer cycling trips were expected in this area of the city because bicycle trips are typically less likely in low density areas where there are fewer destinations that can be reached in short distances, as was found to be the case in the United States [@Pucher2006]. It is also worth noting in this case that Hamilton's suburban areas have far less cycling facilities compared to the lower city, which reinforces the car-centric design of these neighbourhoods. Finally, there is a noteworthy cluster of trip flows in the city's downtown core of 5 km or less. Nielsen and Skov-Petersen [-@Nielsen2018] note that built environment attributes are effective at different spatial scales. They uncovered positive effects of cycling infrastructure within 1 km of the home on the probability of cycling, providing evidence that proximity to cycling facilities can influence transport mode choices [@Nielsen2018]. We hypothesize that this cluster was under-estimated because cycling infrastructure has been built more extensively in the downtown core and is likely normalizing travel by bicycle in this area. The connectivity of such infrastructure between zone of origin and zone of destination may not have been captured in the inferred routes using as the cost function, leading to under-estimation. Likewise, the downtown core features a higher density of destinations within a 1-5 km distance that Hamiltonians could comfortably travel to bicycle, compared to single use neighbourhoods. 
+
+```{r residuals-under, echo = FALSE, fig.cap="\\label{fig:residuals-underestimated} Map of Under-predicted Bicycle Trip Flows (Black lines are provincial highways and green line is the Niagara Escarpment)"}
+ggplot(data = hamilton) +
+  geom_sf(data = hamilton_boundary) +
+  geom_sf(fill = NA, color = "white") +
+  geom_sf(data = OD_table.sf %>% 
+            filter(Trips != 0, 
+                   residuals > 0, 
+                   GTA06_Origin != GTA06_Destination),
+          aes(color = residuals),
+          size = 1) +
+    scale_color_distiller(palette = "Blues", direction = 1) +
+  geom_sf(data = points_interest, 
+          color = "red", 
+          size = 2) +
+  geom_sf_text(data = labels_poi, 
+             aes(label = area)) +
+  geom_sf(data = labels_lines,
+          color = "red", 
+          size = 1) + 
+  geom_sf(data = streets.sf %>% 
+            filter(ROAD_CLASS == "Provincial Highway"), 
+          aes(size = ROAD_CLASS)) + 
+  geom_sf(data = escarpment.sf %>% mutate(type = "Escarpment"), 
+          aes(linetype = type),
+          color = "green4") +
+  scale_size_manual(values = c("Provincial Highway" = 1.5, "Escarpment" = 4.5)) +
+  xlim(st_bbox(Trips_by_Origin)[1], st_bbox(Trips_by_Origin)[3]) +
+  ylim(st_bbox(Trips_by_Origin)[2], st_bbox(Trips_by_Origin)[4]) +
+  theme_tufte() +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.title = element_blank())
+```
+
+```{r residuals-over-5km, echo = FALSE, fig.cap="\\label{fig:residuals-over-5km} Map of Under-predicted Bicycle Trip Flows Over 5 km (Black lines are provincial highways and green line is the Niagara Escarpment)"}
+ggplot(data = hamilton) +
+  geom_sf(data = hamilton_boundary) +
+  geom_sf(fill = NA, color = "white") +
+  geom_sf(data = OD_table.sf %>% 
+            filter(Trips != 0, 
+                   residuals > 0, 
+                   GTA06_Origin != GTA06_Destination, 
+                   quietest_distance >= units::set_units(5, "km")),
+          aes(color = residuals),
+          size = 1) +
+    scale_color_distiller(palette = "Blues", direction = 1) +
+  geom_sf(data = points_interest, 
+          color = "red", 
+          size = 2) +
+  geom_sf_text(data = labels_poi, 
+             aes(label = area)) +
+  geom_sf(data = labels_lines,
+          color = "red", 
+          size = 1) + 
+  geom_sf(data = streets.sf %>% 
+            filter(ROAD_CLASS == "Provincial Highway"), 
+          aes(size = ROAD_CLASS)) + 
+  geom_sf(data = escarpment.sf %>% mutate(type = "Escarpment"), 
+          aes(linetype = type),
+          color = "green4") +
+  scale_size_manual(values = c("Provincial Highway" = 1.5, "Escarpment" = 4.5)) +
+  xlim(st_bbox(Trips_by_Origin)[1], st_bbox(Trips_by_Origin)[3]) +
+  ylim(st_bbox(Trips_by_Origin)[2], st_bbox(Trips_by_Origin)[4]) +
+  theme_tufte() +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.title = element_blank())
+```
+
+```{r residuals-under-5km, echo = FALSE, fig.cap="\\label{fig:residuals-under-5km} Map of Under-predicted Bicycle Trip Flows Less Than 5 km (Black lines are provincial highways and green line is the Niagara Escarpment)"}
+ggplot(data = hamilton) +
+  geom_sf(data = hamilton_boundary) +
+  geom_sf(fill = NA, color = "white") +
+  geom_sf(data = OD_table.sf %>% 
+            filter(Trips != 0, 
+                   residuals > 0, 
+                   GTA06_Origin != GTA06_Destination, 
+                   quietest_distance <= units::set_units(5, "km")),
+          aes(color = residuals),
+          size = 1) +
+    scale_color_distiller(palette = "Blues", direction = 1) +
+  geom_sf(data = points_interest, 
+          color = "red", 
+          size = 2) +
+  geom_sf_text(data = labels_poi, 
+             aes(label = area)) +
+  geom_sf(data = labels_lines,
+          color = "red", 
+          size = 1) + 
+  geom_sf(data = streets.sf %>% 
+            filter(ROAD_CLASS == "Provincial Highway"), 
+          aes(size = ROAD_CLASS)) + 
+  geom_sf(data = escarpment.sf %>% mutate(type = "Escarpment"), 
+          aes(linetype = type),
+          color = "green4") +
+  scale_size_manual(values = c("Provincial Highway" = 1.5, "Escarpment" = 4.5)) +
+  xlim(st_bbox(Trips_by_Origin)[1], st_bbox(Trips_by_Origin)[3]) +
+  ylim(st_bbox(Trips_by_Origin)[2], st_bbox(Trips_by_Origin)[4]) +
+  theme_tufte() +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.title = element_blank())
+```
+
+# Conclusion {#sec:conclusion}
+
+The objective of this study was to address the following questions: 1) *Which attributes at the zones of origin and destination influence cycling trip flows in Hamilton?*; and 2) *Which type of route best explains the pattern of travel by bicycle in Hamilton?*. The use of a spatial interaction model is methodologically more holistic than trip generation analysis, an approach often used in the cycling literature [for instance, see @nolandBikeshareTripGeneration2016], because it considered attributes at the zones of origin and destination, as well as route characteristics to estimate cyclist travel. Use of a routing algorithm like *CycleStreets* also constitutes a novel approach to overcome the limitation of travel surveys. *CycleStreets* enabled us to experiment with different types of routes that cyclists may seek out. The model revealed that shortest-distance *quietest* routes that allow cyclists to avoid traffic best explain the pattern of travel by bicycle in Hamilton. In addition, the availability of jobs and different land uses and destinations at the end of the trip were positive attractors of bicycle trips. Commercial locations and other destinations at the zone of origin, as well as topography, had a negative influence on the number of expected bicycle trips. Other findings include that the misspecification in the analysis of bicycle flows is evident in the form of network autocorrelation - this has been known for other types of flows, but as far as we know, has never been reported in the cycling literature. By testing for network autocorrelation, we are confident in the final model, which not only accounts for various pull-push factors and cost measures, but also indicates that the model sufficiently describes the pattern observed. Finally, analysis of the model residuals to identify under- and over-estimated bicycle flows was also suggestive in terms of other information about potential cycling routes.
+
+Broach et al. [-@Broach2012] noted that in my cases the conventional travel demand model does not address cycling well for several reasons. Cycling is often combined with walking since they are both active modes and it is often excluded after the second step of the travel demand model, meaning that route choice and network assignment are not accounted for. Chen at al. [-@Chen2018] touch upon this as well by suggesting that data about route choice is needed to overcome these limitations. Common approaches of including only the shortest path route between origins and destinations when accounting for cycling in a travel demand model presents additional limitations because it excludes different built environment attributes that are known to influence route choice [@Broach2012]. Use of a routing algorithm helps to overcome the dearth of information on actual routes and can account for variability in route characteristics depending on the availability of data. However, there are advantages and limitations to using cycle routing algorithms. The ability to infer distance and time from different routes that a knowledgeable cyclist would take when modelling bicycle trips using data from travel surveys is particularly efficient when GPS data are not available. Thus, cycle routing algorithms can be more practical for transportation planners because they are less demanding and expensive than collecting route data in travel surveys or creating their own network dataset. A limitation, on the other hand, is the inability to capture the variety of routes that cyclists actually take. GPS data, when available, is more suited to capturing variations between dominant and shortest path routes [@Lu2018understanding]. However, despite some limitations, we offer that the approach outlined in this research can be replicated in other cities covered by *OpenStreetMap* and that strengthening publicly available data in this portal could be useful to measure the influence of route characteristics on travel by bicycle between different origins and destinations. 
+
+The approach adopted in this research also presents future opportunities to systematically investigate the built environment along the inferred routes. For instance, shortest-path *quietest* routes may have attributes that promote travel by bicycle, such as infrastructure or a large proportion of residential streets, which leads to more cycling than expected from the model. To test this assumption, environmental audits were conducted along *quietest* routes for a selection of origin-destination pairs that were under-predicted in order to document the presence or absence of features that may influence cycling [see @Moniruzzaman2012]. The documentation of built environment attributes would contribute to our understanding of what cyclists experience as they travel through the city of Hamilton as well as validate whether the inferred routes match where cyclists do indeed travel. This is the topic of another forthcoming paper [Desjardins et al. 2020b submitted for publication].
+
+# Acknowledgments {#sec:acknowledgments}
+
+The authors wish to express their gratitude to Yongwan Chun and Roberto Patuelli for sharing their `R` code for the Jacqmin-Gadda's $T$ test. In addition, the following `R` packages were used in the course of this investigation and the authors wish to acknowledge their developers: `cyclestreets` [@Lovelace2018], `ggthemes` [@Arnold2019], `kableExtra` [@Zhu2019], `knitr`[@Xie2014; @Xie2015], `rticles` [@Allaire2020], `sf` [@Pebesma2018], `spdep` [@Bivand2013], `tidyverse` [@Wickham2019], `units` [@Pebesma2016], and `zeligverse` [@Gandrud2017].
+
+# References {#references .unnumbered}
+
+\end{document}
