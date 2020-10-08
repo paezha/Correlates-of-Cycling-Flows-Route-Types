@@ -1,40 +1,40 @@
 ---
-title: Correlates of Cycling Flows in Hamilton, Ontario - Fastest, Quietest, or Balanced Routes?
-
-authors: 
-  - name: Elise Desjardins
-    address: School of Geography and Earth Sciences, McMaster University
-    email: desjae@mcmaster.ca
-    footnote: Corresponding Author
-  - name: Christopher D. Higgins
-    address: Department of Human Geography, University of Toronto
-    email: cd.higgins@utoronto.ca
-  - name: Darren M. Scott
-    address: School of Geography and Earth Sciences, McMaster University
-    email: scottdm@mcmaster.ca
-  - name: Emma Apatu
-    address: Department of Health Research Methods, Evidence, and Impact, McMaster University
-    email: apatue@mcmaster.ca
-  - name: Antonio Páez
-    address: School of Geography and Earth Sciences, McMaster University
-    email: paezha@mcmaster.ca
-
-keywords:
-- cycling
-- spatial interaction modelling
-- route choice
-
-abstract: |
-  Cycling is an increasingly popular mode of travel in Canadian urban areas, like the Greater Toronto and Hamilton Area (GTHA). While trip origins and destinations can be inferred from travel surveys, data on route choice is often not collected which makes it challenging to capture the attributes of routes travelled by cyclists. With new algorithms for cycle routing it is now possible to infer routes. Using bicycle trip records from the most recent regional travel survey, a spatial interaction model is developed to investigate the built environment correlates of cycling flows in Hamilton, Ontario, a mid-sized city part of the GTHA. A feature of the analysis is the use of CycleStreets to compare the distance and time according to different routes inferred between trip zones of origin and destination. In addition, network autocorrelation is accounted for in the estimated models. The most parsimonious model suggests that shortest-path quietest routes that minimize traffic best explain the pattern of travel by bicycle in Hamilton. Commercial and office locations and points of interest at the zone of origin negatively correlate with the production of trips, while multiple land uses and the availability of jobs at the zone of destination are trip attractors. The use of a route planner offers a novel approach to modelling and understanding cycling flows within a city. This may be useful for transportation planners to infer different types of routes that cyclists may seek out and consider these in travel demand models.
-
+output: github_document
+always_allow_html: true
 bibliography: References.bib
-bibstyle: spphys
-citation_package: default
-linenumbers: true
-output: rticles::springer_article
-header-includes:
-  - \usepackage{xcolor}
 ---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Correlates of Cycling Flows in Hamilton, Ontario - Fastest, Quietest, or Balanced Routes?
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+Elise Desjardins (McMaster University)  
+Christopher D. Higgins (University of Toronto, Scarborough)  
+Darren M. Scott (McMaster University)  
+Emma Apatou (McMaster University)  
+Antonio Paez (McMaster University)  
+
+## Abstract
+
+Cycling is an increasingly popular mode of travel in Canadian urban areas, like the Greater Toronto and Hamilton Area (GTHA). While trip origins and destinations can be inferred from travel surveys, data on route choice is often not collected which makes it challenging to capture the attributes of routes travelled by cyclists. With new algorithms for cycle routing it is now possible to infer routes. Using bicycle trip records from the most recent regional travel survey, a spatial interaction model is developed to investigate the built environment correlates of cycling flows in Hamilton, Ontario, a mid-sized city part of the GTHA. A feature of the analysis is the use of CycleStreets to compare the distance and time according to different routes inferred between trip zones of origin and destination. In addition, network autocorrelation is accounted for in the estimated models. The most parsimonious model suggests that shortest-path quietest routes that minimize traffic best explain the pattern of travel by bicycle in Hamilton. Commercial and office locations and points of interest at the zone of origin negatively correlate with the production of trips, while multiple land uses and the availability of jobs at the zone of destination are trip attractors. The use of a route planner offers a novel approach to modelling and understanding cycling flows within a city. This may be useful for transportation planners to infer different types of routes that cyclists may seek out and consider these in travel demand models. 
+
+Paper submitted to _Transportation_.
+
+## Keywords
+
+Cycling
+Spatial interaction modelling
+Route choice
 
 ```{r clear-workspace, echo=FALSE}
 rm(list = ls())
@@ -303,7 +303,7 @@ data.frame(
   ),
   Source = c("2016 Canadian Census", "DMTI Spatial Inc.", "City of Hamilton Open Data", "City of Hamilton Open Data", "Teranet Inc., Hamilton Parcel/Land Use Data", "Teranet Inc., Hamilton Parcel/Land Use Data", "Teranet Inc., Hamilton Parcel/Land Use Data", "Transportation Tomorrow Survey", "Transportation Tomorrow Survey")
 ) %>%
-  kable("latex",
+  kable("html",
         booktabs = T,
         caption = "\\label{tab:variables}Demographic and Built Environment Variables Used in the Analysis") %>%
   kable_styling(latex_options = c("scale_down", "striped"),
@@ -397,7 +397,7 @@ data.frame(
     "20.376",
     "18.788")
 ) %>%
-  kable("latex",
+  kable("html",
         booktabs = T,
         caption = "\\label{tab:routes}Descriptive Statistics of Inferred Routes by CycleStreets") %>%
   kable_styling(latex_options = c("scale_down", "striped"),
@@ -445,7 +445,7 @@ data.frame(
     "5.4149",
     "15.791")
 ) %>%
-  kable("latex",
+  kable("html",
         booktabs = T,
         caption = "\\label{tab:detours}Descriptive Statistics of Average Detour of Inferred Routes by CycleStreeets Compared to Euclidean Distance") %>%
   kable_styling(latex_options = c("scale_down", "striped"),
@@ -648,7 +648,7 @@ data.frame(Cost_Variable = factor(c("Euclidean Distance",
          mod2_relative_lk = ifelse(mod2_relative_lk < 0.0001, "<0.0001", round(mod2_relative_lk, 4)),
          mod3_relative_lk = ifelse(mod3_relative_lk < 0.0001, "<0.0001", round(mod3_relative_lk, 4))) %>%
   select(Cost_Variable, mod2, mod2_relative_lk, mod3, mod3_relative_lk) %>%
-  kable("latex",
+  kable("html",
         booktabs = T,
         col.names = c("Cost Variable", 
                       "AIC", "Relative Likelihood", "AIC", "Relative Likelihood"),
@@ -787,7 +787,7 @@ summary.df <- rbind(summary.df,
 
 # Create table
 kable(summary.df, 
-      "latex", 
+      "html", 
       digits = 4, 
       booktabs = T,
       col.names = c("Variable", "Estimate", "p-value", "Estimate", "p-value", "Estimate", "p-value", "Estimate", "p-value"),
@@ -834,7 +834,7 @@ data.frame(
   Characteristics = c("% Trip Flows >= 10 km", "% Trip Flows >= 5 km", "% Trip Flows <= 5 km", "% Trip Flows <= 2.5 km", "% Trip Flows Rural/Escarpment to Lower City", "% Trip Flows Lower City to Rural/Escarpment", "% Trip Flows Only Rural/Escarpment", "% Trip Flows Only Lower City", "% Trip Flows <= 2.5 km in Lower City", "% Trip Flows <= 5 km in Lower City", "% Trip Flows >= 5 km in Lower City", "% Trip Flows <= 2.5 km in Rural/Escarpment Area", "% Trip Flows <= 5 km in Rural/Escarpment Area", "% Trip Flows >= 5 km in Rural/Escarpment Area"),
   Percentage = c("4.6%", "21.4%", "78.6%", "48.5%", "1.9%", "1.9%", "16.8%", "79.4%", "52.4%", "80.8%", "19.2%", "40.9%", "86.4%", "13.6%")
 ) %>%
-  knitr::kable("latex",
+  knitr::kable("html",
         booktabs = T,
       caption = "\\label{tab:flow-descriptives}Bicycle Trip Flow Characteristics According to Quietest Distance Routes") %>%
   kable_styling(latex_options = c("striped"),
@@ -998,5 +998,3 @@ The approach adopted in this research also presents future opportunities to syst
 The authors wish to express their gratitude to Yongwan Chun and Roberto Patuelli for sharing their `R` code for the Jacqmin-Gadda's $T$ test. In addition, the following `R` packages were used in the course of this investigation and the authors wish to acknowledge their developers: `cyclestreets` [@Lovelace2018], `ggthemes` [@Arnold2019], `kableExtra` [@Zhu2019], `knitr`[@Xie2014; @Xie2015], `rticles` [@Allaire2020], `sf` [@Pebesma2018], `spdep` [@Bivand2013], `tidyverse` [@Wickham2019], `units` [@Pebesma2016], and `zeligverse` [@Gandrud2017].
 
 # References {#references .unnumbered}
-
-\end{document}
