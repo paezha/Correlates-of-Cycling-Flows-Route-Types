@@ -137,7 +137,7 @@ The City of Hamilton, a mid-sized city located in the Greater Toronto and Hamilt
 
 To address these gaps in knowledge, the objective of this study is to investigate the correlates of cycling flows in Hamilton. This paper describes the development of a spatial interaction model [a component of the four-step travel model; see @deDios2011Modelling] to test the level of cycling flows against various attributes at the zones of origin and destination. Travel surveys are typically rich in terms of information about where trips start or end, but are less informative with respect to route characteristics, which often have to be inferred. For this reason, a feature of the analysis is the use of an algorithm for cycle routing, *CycleStreets*, to infer and compare different routes between the zones of origin and destination instead of using only the shortest-path distance. This algorithm identifies routes according to various attributes and characterizes them as *fastest*, *quietest*, and *balanced* routes. The distance and time from the zone of origin to destination along each inferred route serve as measures of cost in the analysis. The following two questions are addressed: 1) *Which attributes at the zones of origin and destination influence cycling trip flows in Hamilton?*; and 2) *Which type of route best explains the pattern of cycling trip flows in Hamilton?* In addition, residuals from the spatial interaction model are analyzed using a spatial autocorrelation statistic to assess the model's compliance with the assumption of independently distributed residuals. Future opportunities for research and practice, including assessment of the built environment along select routes identified by the algorithm, are also discussed.
 
-Note that all data and code used in this research are available online. The source for this paper is an R markdown document that can be obtained from the following GitHub repository:
+Following recommendations for reproducible research in the spatial sciences [see @brunsdon2020opening], all data and code used in this paper are available online. The source for this paper is an R markdown document that can be obtained from the following GitHub repository:
 
 > https://github.com/paezha/Correlates-of-Cycling-Flows-Route-Types
 
@@ -169,31 +169,45 @@ We use spatial interaction methods to analyze bicycle trip flows in Hamilton, On
 
 Spatial interaction models operate on principles of propulsion, attraction, and the friction of space [@Rodrigue2020]. In other words, we can assume that there are factors within a particular geographic area that contribute to producing or generating trips, such as residential or population density, and there are factors in other geographic areas that attract trips like jobs or amenities. Finally, there is the friction of space, in other words, the cost incurred in reaching a destination from an origin. Spatial interaction models are useful for estimating or explaining variation of spatial flows in a particular system or to predict them in different scenarios.
 
-The spatial interaction model is generally represented by Equation (1):
-$$
+The spatial interaction model is generally represented by the following expression:
+\begin{equation}
+\label{eq:interaction-model}
 U_{ij} = f(V_i, Wj, d_{ij})
-$$
+\end{equation}
+
 \noindent where $i$ represents the origin, $j$ represents the destination, $U_{ij}$ is the total interaction between origin and destination (i.e., for this analysis it is the number of bicycle trips recorded in the *TTS*), $V_i$ is a vector of attributes at the zone of origin (i.e., the push factors), $W_j$ is a vector of attributes at the zone of destination (i.e., the pull factors), and $d_{ij}$ represents the cost of making the trip (i.e., often the distance or time as a measurement of spatial separation). 
 
-Poisson regression is commonly used in the estimation of a spatial interaction model when the dependent variable is available as a count [@Chun2008; @Griffith2011; @Metulini2018]. This specification of the gravity model estimates the level of flows based on explanatory variables at the origin and destination [@griffithConstrainedVariantsGravity2016]. This regression model is also suitable for datasets that contain true zero counts [@Griffith2011], as is the case when many zones of origin and destination do not generate trips. For our analysis, bicycle trip counts serve as the dependent variable and built environment or demographic attributes known to influence cycling serve as independent variables.
+Poisson regression is commonly used in the estimation of a spatial interaction model when the dependent variable is available as a count [@Chun2008; @Griffith2011; @Metulini2018]. This specification of the gravity model estimates the level of flows based on explanatory variables at the origin and destination [@griffithConstrainedVariantsGravity2016]. This regression model is also suitable for datasets that contain true zero counts [@Griffith2011], as is the case when many zones of origin and destination do not generate trips. The model Poisson model is:
+\begin{equation}
+\label{eq:poisson-model}
+P(U_{ij}|x,\theta) = \frac{\lambda^U_{ij}}{U_{ij}!}e^{-\lambda} 
+\end{equation}
 
-Poisson regression has a log-linear form when the logarithm is applied as a link function. Therefore, the doubly-constrained gravity model can be represented by the Equation (2):
-$$
-ln(\mu_{ij}) = \lambda + \lambda_O ln(V_i) + \lambda_Dln(W_j) + \beta ln(d_{ij})
-$$
-\noindent where $\mu_{ij}$ is the number of bicycle trips between zone of origin $i$ and zone of destination $j$, $V_i$ and $W_j$ represent the push and pull factors at $i$ and $j$ respectively, $d_{ij}$ is the cost or separation between the zone of origin $i$ and zone of destination $j$, and $\lambda$ and $\beta$ are estimable parameters.
+To estimate the model, we work with the mean function $\lambda$:
+\begin{equation}
+\label{eq:mean-function}
+\lambda = e^{\theta^\prime x} 
+\end{equation}
 
-The probability of the observed flows that follow a Poisson distribution represented by Equation (3):
-$$
-P(m_{ij}) = \frac{\mu_{ij}^{m_{ij}}e^{-\mu_{ij}}}{m_{ij}!}
-$$
+The generalized linear version of the model uses the natural logarithm as the link function, which leads to the following log-linear specification of the mean function [see @Chun2008]:
+\begin{equation}
+\label{eq:link-function}
+ln(U_{ij}) = \theta_0 + \theta_O ln(V_i) + \theta_Dln(W_j) + \theta_C ln(d_{ij}) 
+\end{equation}
 
-As highlighted by numerous studies [e.g., @Chun2008; @Metulini2018], spatial or network autocorrelation can occur in spatial interaction models because of, among other things, unobservable factors at the zone of origin or destination that are not included in the model or a misspecified cost function. Failing to account for network autocorrelation can lead to unreliable findings or misleading interpretations of the behaviour modelled [@Chun2008; @griffithConstrainedVariantsGravity2016]. Chun [-@Chun2008] notes that "spatially distributed observations can be decomposed into a systematic trend and an autocorrelated unexplained random component." Recent papers on modelling spatial interaction have proposed the use of eigenvector spatial filtering (ESF) [@Chun2008; @Griffith2011; @Metulini2018]. In this respect, use of Moran's $I$ has been criticized for the case of residuals of a Poisson regression model because it is based on a normality assumption and Poisson has distributional properties that are not well known [@Chun2008]. Instead the $T$ statistic [see @Jacqmin1997] is recommended for applications in spatial interaction modelling [@Chun2008; @Metulini2018]. An important assumption to note is that the residuals of the model are random and uncorrelated.
+In Equation \ref{eq:link-function}, $x = [1, V_i, W_j, d_{ij}]$ is the vector of correlates including constant term(s), variables at the origin ($V_i$), at the destination ($W_j$), and the cost of movement between origin and destination ($d_{ij}$). These correlates are associated with a vector of estimable parameters $\theta = [\theta_0, \theta_O, \theta_D, \theta_C]$ corresponding to the constant term(s), and the variables at the origin, at the destination, and the cost.
 
-The $T$ statistic derived by Jacqmin-Gadda et al. [-@Jacqmin1997] has the following Equation (4):
-$$
+For our analysis, bicycle trip counts serve as the dependent variable and built environment or demographic attributes known to influence cycling serve as independent variables, with $V_i$ and $W_j$ representing push and pull factors at $i$ and $j$ respectively, and $d_{ij}$ the cost or separation between the zone of origin $i$ and zone of destination $j$.
+
+As highlighted by numerous studies [e.g., @Chun2008; @Metulini2018], spatial or network autocorrelation can occur in spatial interaction models because of, among other things, unobservable factors at the zone of origin or destination that are not included in the model, or a misspecified cost function. Failing to account for network autocorrelation can lead to unreliable findings or misleading interpretations of the behaviour modelled [@Chun2008; @griffithConstrainedVariantsGravity2016]. In this respect, use of Moran's $I$ has been criticized for the case of residuals of a Poisson regression model because it is based on a normality assumption and Poisson has distributional properties that are not well known [@Chun2008]. Instead the $T$ statistic [see @Jacqmin1997] is recommended for applications in spatial interaction modelling [@Chun2008; @Metulini2018].
+
+The $T$ statistic derived by Jacqmin-Gadda et al. [-@Jacqmin1997] has the following equation:
+\begin{equation}
+\label{eq:T-statistic}
 T = \sum_{i=1}^{N} \sum_{j\ne{i}}^{N} w_{ij}(Y_i - \hat{\mu_i})(Y_j - \hat{\mu_j})
-$$
+\end{equation}
+
+In Equation \ref{eq:T-statistic}, the term $w_{ij}$ is a weight that indicates whether, and if so to what extent, zones $i$ and $j$ are related in space (conventionally $0\le w_{ij}\le 1$); $Y_i$ is a spatial random variable, and $\hat{\mu_i}$ is the estimated value of the variable according to a suitable model.
 
 ## Study Area
 
@@ -624,16 +638,21 @@ model3_gadda <- t.test.gadda(model3, hamilton_listw_net)
 
 Akaike's information criterion ($AIC$) is used to compare the various models. As a test for goodness of fit, it estimates the relative quality of statistical models. The model with the lowest $AIC$ is selected as the model that minimizes information loss, while considering parsimony of the specification.
 
-The $AIC$ is calculated by Equation (5):
-$$
-AIC = 2k - 2ln(L)
-$$
+The $AIC$ is calculated by Equation \ref{eq:aic}:
+
+\begin{equation}
+\label{eq:aic}
+AIC = 2k - 2ln(L) 
+\end{equation}
+
 \noindent where $k$ is the number of estimated parameters and $L$ is the maximum value of the likelihood function of the model.
 
 In addition, $AIC$ is used in the calculation of the relative likelihood, which is defined as:
-$$
+
+\begin{equation}
+\label{eq:relative-likelihood}
 e^{\frac{AIC_{min} - AIC_i}{2}}
-$$
+\end{equation}
 
 In the above, $AIC_{min}$ is the $AIC$ of the model that minimizes this criterion, and $AIC_i$ is the $AIC$ of a competing model. This measure of goodness of fit is interpreted as the probability that the competing model minimizes information loss to the same extent as the best model. It is important to note that although comparison of $AIC$ from a set of models indicates the model with the best fit, it does not reveal any information about the quality of each model, which is why analysis of the residuals is important as well.
 
@@ -658,15 +677,16 @@ data.frame(Cost_Variable = factor(c("Euclidean Distance",
                       mod3 = aic_mod3$AIC) %>%
   mutate(mod2_relative_lk = c(exp((aic_mod3$AIC[4] - aic_mod2$AIC)/2)),
          mod3_relative_lk = c(exp((aic_mod3$AIC[4] - aic_mod3$AIC)/2)),
-         mod2_relative_lk = ifelse(mod2_relative_lk < 0.0001, "<0.0001", round(mod2_relative_lk, 4)),
-         mod3_relative_lk = ifelse(mod3_relative_lk < 0.0001, "<0.0001", round(mod3_relative_lk, 4))) %>%
+         mod2_relative_lk = ifelse(mod2_relative_lk < 0.0001, "$<$0.0001", round(mod2_relative_lk, 4)),
+         mod3_relative_lk = ifelse(mod3_relative_lk < 0.0001, "$<$0.0001", round(mod3_relative_lk, 4))) %>%
   select(Cost_Variable, mod2, mod2_relative_lk, mod3, mod3_relative_lk) %>%
   kable("latex",
         booktabs = T,
         col.names = c("Cost Variable", 
                       "AIC", "Relative Likelihood", "AIC", "Relative Likelihood"),
         align = c("l", "c", "c", "c", "c"),
-        caption = "\\label{tab:model-comparison} Model Comparison: AIC and Relative Likelihood") %>%
+        caption = "\\label{tab:model-comparison} Model Comparison: AIC and Relative Likelihood",
+        escape = FALSE) %>%
     add_header_above(c("", "Model 2" = 2, "Model 3" = 2)) %>%
     kable_styling(latex_options = c("scale_down", "striped")) %>%
   footnote(general = c("Relative likelihood is calculated with respect to Model 3:Quietest Distance"))
@@ -715,13 +735,13 @@ summary.df <- summary0.df %>% full_join(summary1.df,
          Estimate2 = Estimate.x.x, pvalue2 = pvalue.x.x,
          Estimate3 = Estimate.y.y, pvalue3 = pvalue.y.y) %>%
   mutate(Estimate0 = case_when(!is.na(Estimate0) ~ paste(round(Estimate0, 4))), 
-         pvalue0 = ifelse(pvalue0 < 0.0001, "< 0.0001", round(pvalue0, 4)),
+         pvalue0 = ifelse(pvalue0 < 0.0001, "<0.0001", round(pvalue0, 4)),
          Estimate1 = case_when(!is.na(Estimate1) ~ paste(round(Estimate1, 4))), 
-         pvalue1 = ifelse(pvalue1 < 0.0001, "< 0.0001", round(pvalue1, 4)),
+         pvalue1 = ifelse(pvalue1 < 0.0001, "<0.0001", round(pvalue1, 4)),
          Estimate2 = case_when(!is.na(Estimate2) ~ paste(round(Estimate2, 4))), 
-         pvalue2 = ifelse(pvalue2 < 0.0001, "< 0.0001", round(pvalue2, 4)),
+         pvalue2 = ifelse(pvalue2 < 0.0001, "<0.0001", round(pvalue2, 4)),
          Estimate3 = case_when(!is.na(Estimate3) ~ paste(round(Estimate3, 4))), 
-         pvalue3 = ifelse(pvalue3 < 0.0001, "< 0.0001", round(pvalue3, 4))) %>%
+         pvalue3 = ifelse(pvalue3 < 0.0001, "<0.0001", round(pvalue3, 4))) %>%
   replace_na(list(Estimate0 = " ", pvalue0 = " ",
                   Estimate1 = " ", pvalue1 = " ",
                   Estimate2 = " ", pvalue2 = " ",
@@ -739,13 +759,13 @@ model_diagnostics <- data.frame(Variable = c("Jacqmin-Gadda z(T)",
                                               " ",
                                               " "),
                                 pvalue0 = c(ifelse(model0_gadda$pvalue < 0.0001, 
-                                                   "p < 0.0001", 
+                                                   "p<0.0001", 
                                                    paste("p = ", round(model0_gadda$pvalue, 4))),
                                             as.character(round(results0@gof[5], digits = 4)),
                                             as.character(round(results0@gof[3], digits = 4)),
                                             as.character(round(results0@gof[1], digits = 4)),
                                             ifelse(exp((results3@gof[1] - results0@gof[1])/2) < 0.0001, 
-                                                   "< 0.0001", 
+                                                   "<0.0001", 
                                                    round(exp((results3@gof[1] - results0@gof[1])/2),
                                                          4))),
                                 Estimate1 = c(round(model1_gadda$z, 4),
@@ -754,13 +774,13 @@ model_diagnostics <- data.frame(Variable = c("Jacqmin-Gadda z(T)",
                                               " ",
                                               " "),
                                 pvalue1 = c(ifelse(model1_gadda$pvalue < 0.0001, 
-                                                   "p < 0.0001", 
+                                                   "p<0.0001", 
                                                    paste("p = ", round(model1_gadda$pvalue, 4))),
                                             as.character(round(results1@gof[5], digits = 4)),
                                             as.character(round(results1@gof[3], digits = 4)),
                                             as.character(round(results1@gof[1], digits = 4)),
                                             ifelse(exp((results3@gof[1] - results1@gof[1])/2) < 0.0001, 
-                                                   "< 0.0001", 
+                                                   "<0.0001", 
                                                    round(exp((results3@gof[1] - results1@gof[1])/2),
                                                          4))),
                                 Estimate2 = c(round(model2_gadda$z, 4),
@@ -769,13 +789,13 @@ model_diagnostics <- data.frame(Variable = c("Jacqmin-Gadda z(T)",
                                               " ",
                                               " "),
                                 pvalue2 = c(ifelse(model2_gadda$pvalue < 0.0001, 
-                                                   "p < 0.0001", 
+                                                   "p<0.0001", 
                                                    paste("p = ", round(model2_gadda$pvalue, 4))),
                                             as.character(round(results2@gof[5], digits = 4)),
                                             as.character(round(results2@gof[3], digits = 4)),
                                             as.character(round(results2@gof[1], digits = 4)),
                                             ifelse(exp((results3@gof[1] - results2@gof[1])/2) < 0.0001, 
-                                                   "< 0.0001", 
+                                                   "<0.0001", 
                                                    round(exp((results3@gof[1] - results2@gof[1])/2),
                                                          4))),
                                 Estimate3 = c(round(model3_gadda$z, 4),
@@ -784,13 +804,13 @@ model_diagnostics <- data.frame(Variable = c("Jacqmin-Gadda z(T)",
                                               " ",
                                               " "),
                                 pvalue3 = c(ifelse(model3_gadda$pvalue < 0.0001, 
-                                                   "p < 0.0001", 
+                                                   "p<0.0001", 
                                                    paste("p = ", round(model3_gadda$pvalue, 4))),
                                             as.character(round(results3@gof[5], digits = 4)),
                                             as.character(round(results3@gof[3], digits = 4)),
                                             as.character(round(results3@gof[1], digits = 4)),
                                             ifelse(exp((results3@gof[1] - results3@gof[1])/2) < 0.0001, 
-                                                   "< 0.0001", 
+                                                   "$0.0001", 
                                                    round(exp((results3@gof[1] - results3@gof[1])/2),
                                                          4))))
 
@@ -809,9 +829,8 @@ kable(summary.df,
   add_header_above(c("", "Base Model" = 2, "Model 1" = 2, "Model 2" = 2, "Model 3" = 2)) %>%
   kable_styling(latex_options = c("scale_down", "striped"))  %>% 
   pack_rows("Model diagnostics", 24, 28, latex_gap_space = "2em") %>%
-  footnote(general = c("Jacqmin-Gadda $T$ is converted to a $z$-score",
-                       "Relative likelihood is calculated with respect to Model 3"),
-           escape = FALSE) %>%
+  footnote(general = c("Jacqmin-Gadda T is converted to a z-score",
+                       "Relative likelihood is calculated with respect to Model 3")) %>%
   landscape()
 ```
 
@@ -854,12 +873,13 @@ Open source tools such as *CycleStreets* allow for the estimation of a cost vari
 
 ```{r echo=FALSE}
 data.frame(
-  Characteristics = c("% Trip Flows >= 10 km", "% Trip Flows >= 5 km", "% Trip Flows <= 5 km", "% Trip Flows <= 2.5 km", "% Trip Flows Rural/Escarpment to Lower City", "% Trip Flows Lower City to Rural/Escarpment", "% Trip Flows Only Rural/Escarpment", "% Trip Flows Only Lower City", "% Trip Flows <= 2.5 km in Lower City", "% Trip Flows <= 5 km in Lower City", "% Trip Flows >= 5 km in Lower City", "% Trip Flows <= 2.5 km in Rural/Escarpment Area", "% Trip Flows <= 5 km in Rural/Escarpment Area", "% Trip Flows >= 5 km in Rural/Escarpment Area"),
-  Percentage = c("4.6%", "21.4%", "78.6%", "48.5%", "1.9%", "1.9%", "16.8%", "79.4%", "52.4%", "80.8%", "19.2%", "40.9%", "86.4%", "13.6%")
+  Characteristics = c("Trip Flows $\\ge$ 10 km", "Trip Flows $\\ge$ 5 km", "Trip Flows $\\le$ 5 km", "Trip Flows $\\le$ 2.5 km", "Trip Flows Rural/Escarpment to Lower City", "Trip Flows Lower City to Rural/Escarpment", "Trip Flows Only Rural/Escarpment", "Trip Flows Only Lower City", "Trip Flows $\\le$ 2.5 km in Lower City", "Trip Flows $\\le$ 5 km in Lower City", "Trip Flows $\\ge$ 5 km in Lower City", "Trip Flows $\\le$ 2.5 km in Rural/Escarpment Area", "Trip Flows $\\le$ 5 km in Rural/Escarpment Area", "Trip Flows $\\ge$ 5 km in Rural/Escarpment Area"),
+  Percentage = c("4.6\\%", "21.4\\%", "78.6\\%", "48.5\\%", "1.9\\%", "1.9\\%", "16.8\\%", "79.4\\%", "52.4\\%", "80.8\\%", "19.2\\%", "40.9\\%", "86.4\\%", "13.6\\%")
 ) %>%
   knitr::kable("latex",
         booktabs = T,
-      caption = "\\label{tab:flow-descriptives}Bicycle Trip Flow Characteristics According to Quietest Distance Routes") %>%
+      caption = "\\label{tab:flow-descriptives}Bicycle Trip Flow Characteristics According to Quietest Distance Routes",
+      escape = FALSE) %>%
   kable_styling(latex_options = c("striped"),
                 font_size = 9) %>%
   column_spec(1, italic = T, border_right = T) %>%
