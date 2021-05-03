@@ -32,31 +32,6 @@
 
 
 % Pandoc citation processing
-\newlength{\csllabelwidth}
-\setlength{\csllabelwidth}{3em}
-\newlength{\cslhangindent}
-\setlength{\cslhangindent}{1.5em}
-% for Pandoc 2.8 to 2.10.1
-\newenvironment{cslreferences}%
-  {}%
-  {\par}
-% For Pandoc 2.11+
-\newenvironment{CSLReferences}[3] % #1 hanging-ident, #2 entry spacing
- {% don't indent paragraphs
-  \setlength{\parindent}{0pt}
-  % turn on hanging indent if param 1 is 1
-  \ifodd #1 \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces\fi
-  % set entry spacing
-  \ifnum #2 > 0
-  \setlength{\parskip}{#2\baselineskip}
-  \fi
- }%
- {}
-\usepackage{calc} % for calculating minipage widths
-\newcommand{\CSLBlock}[1]{#1\hfill\break}
-\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
-\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}}
-\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
 \usepackage{xcolor}
 \usepackage{booktabs}
@@ -76,13 +51,12 @@
 
 \begin{document}
 
-\title{Correlates of Cycling Flows in Hamilton, Ontario - Fastest,
-Quietest, or Balanced Routes? }
+\title{Correlates of Cycling Flows in Hamilton, Ontario - Fastest, Quietest, or
+Balanced Routes? }
 
 
 
-\author{  Elise Desjardins \and  Christopher D. Higgins \and  Darren M.
-Scott \and  Emma Apatu \and  Antonio Páez \and  }
+\author{  Elise Desjardins \and  Christopher D. Higgins \and  Darren M. Scott \and  Emma Apatu \and  Antonio Páez \and  }
 
 
 \institute{
@@ -102,8 +76,8 @@ Scott \and  Emma Apatu \and  Antonio Páez \and  }
 %             \emph{Present address:} of F. Author  %  if needed
     \and
         Emma Apatu \at
-     Department of Health Research Methods, Evidence, and Impact,
-McMaster University \\
+     Department of Health Research Methods, Evidence, and Impact, McMaster
+ University \\
      \email{\href{mailto:apatue@mcmaster.ca}{\nolinkurl{apatue@mcmaster.ca}}}  %  \\
 %             \emph{Present address:} of F. Author  %  if needed
     \and
@@ -172,7 +146,7 @@ Compared to other transportation modes, travelling by bicycle is more
 enjoyable (Páez and Whalen 2010), and is associated with better
 self-perceived health (Avila-Palencia et al. 2018) and reduced risk of
 chronic disease (Celis-Morales, Lyall, and Welsh 2017; Oja et al. 2011).
-Furthermore, cycling also leads to reduced greehouse gas emissions
+Furthermore, cycling also leads to reduced greenhouse gas emissions
 (Zahabi et al. 2016) and improved air and noise pollution (De Nazelle et
 al. 2011). These benefits serve as motivation for cities to encourage
 more travel by this mode, but this requires effort to put cycling on par
@@ -203,15 +177,14 @@ as a developing cycling city (see Liu et al. 2020) because efforts to
 increase cycling have been implemented and cycling levels are growing.
 Recent studies in Hamilton have used global positioning system (GPS)
 data from the bike share program to conduct route choice analysis (Lu,
-Scott, and Dalumpines 2018; Darren M. Scott, Lu, and Brown 2021) and
-explore influences on bike share ridership (Darren M. Scott and Ciuro
-2019). However, we still know relatively little about trips in this city
-beyond those made by bike share. To date, there has been no published
-research that has investigated the pattern of bicycle trips in Hamilton
-using data from the 2016 \emph{Transportation Tomorrow Survey}. Our
-understanding of the spatial distribution of such trips in a mid-sized
-developing cycling city and the influence of the built environment is
-also limited.
+Scott, and Dalumpines 2018; Scott, Lu, and Brown 2021) and explore
+influences on bike share ridership (Scott and Ciuro 2019). However, we
+still know relatively little about trips in this city beyond those made
+by bike share. To date, there has been no published research that has
+investigated the pattern of bicycle trips in Hamilton using data from
+the 2016 \emph{Transportation Tomorrow Survey}. Our understanding of the
+spatial distribution of such trips in a mid-sized developing cycling
+city and the influence of the built environment is also limited.
 
 To address these gaps in knowledge, the objective of this study is to
 investigate the correlates of cycling flows in Hamilton. This paper
@@ -278,7 +251,7 @@ the influence of the built environment on walking and cycling. These
 modes, more so than motorized travel, allow a traveller to interact more
 intimately with the micro-level environment (Moniruzzaman and Páez 2012,
 2016; Moudon and Lee 2003). This type of framework holds true for
-bicycle trip analysis as well. Winters et al. (2010) conducted a study
+bicycle trip analysis as well. Winters et al.~(2010) conducted a study
 measuring built environment variables at three different scales in
 Vancouver, Canada and found that the built environment around the origin
 and destination, as well as along the route, are indeed different and
@@ -291,24 +264,24 @@ community-level.
 \subsection{Macro-Level Built Environment Factors}\label{macro}}
 
 The urban form at the places where bicycle trips originate and end is
-important (Darren M. Scott and Ciuro 2019). This topic is
-well-documented in the cycling literature. Land use mix, whereby people
-can reach a variety of amenities within a distance that is comfortable
-to cycle, influences travel by bicycle (Cervero, Denman, and Jin 2019;
-Sallis et al. 2013; Winters et al. 2010; Zhao 2014). For instance,
-Heesch et al. (2015) found that shorter distances to destinations,
-including a business district with jobs and a river where there are
-bicycle paths, increased the odds of cycling in Brisbane, Australia.
-Higher densities of population (Nielsen and Skov-Petersen 2018;
-Nordengen et al. 2019; Schneider and Stefanich 2015; Winters et al.
-2010) and employment (Le, Buehler, and Hankey 2018; Zhao 2014) are other
-important factors. In the case of cities with low levels of cycling,
-access to bicycles can make this mode more attractive. Cole-Hunter et
-al. (2015) report that public bicycle share stations near the residence
-were a significant positive determinant of commuting by bicycle. The
-quality of the urban environment also matters. Areas with trees and
-green space also associated with more cycling (Cole-Hunter et al. 2015;
-Le, Buehler, and Hankey 2018; Mertens et al. 2017).
+important (Scott and Ciuro 2019). This topic is well-documented in the
+cycling literature. Land use mix, whereby people can reach a variety of
+amenities within a distance that is comfortable to cycle, influences
+travel by bicycle (Cervero, Denman, and Jin 2019; Sallis et al. 2013;
+Winters et al. 2010; Zhao 2014). For instance, Heesch et al.~(2015)
+found that shorter distances to destinations, including a business
+district with jobs and a river where there are bicycle paths, increased
+the odds of cycling in Brisbane, Australia. Higher densities of
+population (Nielsen and Skov-Petersen 2018; Nordengen et al. 2019;
+Schneider and Stefanich 2015; Winters et al. 2010) and employment (Le,
+Buehler, and Hankey 2018; Zhao 2014) are other important factors. In the
+case of cities with low levels of cycling, access to bicycles can make
+this mode more attractive. Cole-Hunter et al.~(2015) report that public
+bicycle share stations near the residence were a significant positive
+determinant of commuting by bicycle. The quality of the urban
+environment also matters. Areas with trees and green space also
+associated with more cycling (Cole-Hunter et al. 2015; Le, Buehler, and
+Hankey 2018; Mertens et al. 2017).
 
 In most studies, a combination of these attributes are found to
 influence cycling, which suggests that multiple factors are needed to
@@ -320,8 +293,8 @@ reached in a short distance. However, there is variation in the relative
 influence of these attributes across studies and across places, which
 might reveal different effects that are related to contextual
 behaviours, or planning and transportation policies. For example,
-residential density (Darren M. Scott and Ciuro 2019; Zhao 2014) and the
-presence of cycling infrastructure (Moudon et al. 2005) are not always a
+residential density (Scott and Ciuro 2019; Zhao 2014) and the presence
+of cycling infrastructure (Moudon et al. 2005) are not always a
 significant factor. Therefore, additional analysis to determine the
 influence of specific attributes on cycling levels is important in
 developing cycling cities, where such studies have not been previously
@@ -337,17 +310,17 @@ more bicycle trips in cities that are predominantly car-centric (Adam,
 Jones, and te Brömmelstroet 2020). The provision of, or proximity to,
 infrastructure has been found to have a influence or association with
 cycling behaviour (\emph{inter alia}, see Buehler and Pucher 2012;
-Buehler and Dill 2016; J. Dill and Carr 2003; Mertens et al. 2017;
-Winters et al. 2010). For example, Le et al. (2018) found that cycling
+Buehler and Dill 2016; Dill and Carr 2003; Mertens et al. 2017; Winters
+et al. 2010). For example, Le et al.~(2018) found that cycling
 facilities had a strong association with bicycle volume and traffic
 based on their analysis of 20 metropolitan statistical areas in the
 United States. Infrastructure can be very influential - a new bicycle
 lane in Oslo, Norway attracted trips by shifting cyclists from other
 parallel routes (Pritchard, Bucher, and Frøyen 2019). Cyclists also
 detour from dominant routes to incorporate cycling facilities in their
-travels (Darren M. Scott, Lu, and Brown 2021). This suggests that it is
-not uncommon for preferred routes to change as new facilities are built
-over time and they are incorporated into daily trips. Furthermore,
+travels (Scott, Lu, and Brown 2021). This suggests that it is not
+uncommon for preferred routes to change as new facilities are built over
+time and they are incorporated into daily trips. Furthermore,
 infrastructure can also increase perceptions of cycling safety
 (Branion-Calles et al. 2019) which may encourage more trips. At the very
 least, cycling infrastructure is a visual and physical sign that streets
@@ -360,23 +333,23 @@ variety of methods to reveal the preferences of cyclists including data
 obtained from global positioning system (GPS) devices or smartphone
 applications (Pritchard 2018). In general, studies using such data
 confirm that people who cycle prefer routes with separated facilities
-over mixing with traffic (Chen, Shen, and Childress 2018; Jennifer Dill
-2009; El-Assi, Mahmoud, and Habib 2017; Lu, Scott, and Dalumpines 2018;
+over mixing with traffic (Chen, Shen, and Childress 2018; Dill 2009;
+El-Assi, Mahmoud, and Habib 2017; Lu, Scott, and Dalumpines 2018;
 Skov-Petersen et al. 2018) and incorporate infrastructure as part of
-their routes (Jennifer Dill 2009; Lu, Scott, and Dalumpines 2018;
-Pritchard, Bucher, and Frøyen 2019; Darren M. Scott, Lu, and Brown
-2021). One study conducted in Portland, Oregon using GPS data found that
-streets with bike lanes were comparable in attractiveness to streets
-with low traffic volume (Broach, Dill, and Gliebe 2012). By examining
-GPS data from Hamilton's bike share program, Lu et al. (2018) found that
-users travel routes that are significantly longer than the shortest path
-distance and are more likely to use local streets with low traffic and
-bicycle facilities. Similarly, Chen et al. (2018) also reported that
-people who travel by bicycle in Seattle, Washington prefer short and
-flat routes with connected facilities on roads that have low traffic
-speeds. Their study found more variability with respect to preference
-for views along routes with features like mixed land use, street trees,
-lighting, and city features.
+their routes (Dill 2009; Lu, Scott, and Dalumpines 2018; Pritchard,
+Bucher, and Frøyen 2019; Scott, Lu, and Brown 2021). One study conducted
+in Portland, Oregon using GPS data found that streets with bike lanes
+were comparable in attractiveness to streets with low traffic volume
+(Broach, Dill, and Gliebe 2012). By examining GPS data from Hamilton's
+bike share program, Lu et al.~(2018) found that users travel routes that
+are significantly longer than the shortest path distance and are more
+likely to use local streets with low traffic and bicycle facilities.
+Similarly, Chen et al.~(2018) also reported that people who travel by
+bicycle in Seattle, Washington prefer short and flat routes with
+connected facilities on roads that have low traffic speeds. Their study
+found more variability with respect to preference for views along routes
+with features like mixed land use, street trees, lighting, and city
+features.
 
 Cycling facilities and street connectivity have most consistently been
 found to be an important attribute of the built environment for
@@ -385,7 +358,7 @@ variables at two or more spatial scales, as outlined in Moudon and Lee's
 (2003) framework to capture a comprehensive view of the variability in
 the built environment that a cyclist might encounter. Winters et al.'s
 (2010) study in Vancouver, Canada is an exception, as is a recent study
-conducted by Cole-Hunter et al. (2015) that took some factors at the
+conducted by Cole-Hunter et al.~(2015) that took some factors at the
 route level into account in their analysis of cycling propensity in
 Barcelona, Spain. Nielsen and Skov-Petersen (2018) recently analyzed the
 influence of built environment attributes at three different scales on
@@ -406,7 +379,7 @@ We use spatial interaction methods to analyze bicycle trip flows in
 Hamilton, Ontario. In the form of a gravity model, this modelling
 approach can account for multiple spatial zones along a cycling trip,
 and is therefore a more holistic approach than trip generation analysis
-(e.g. Dios Ortúzar and Willumsen 2011, chap. 5). The
+(e.g.~Dios Ortúzar and Willumsen 2011, chap. 5). The
 \emph{Transportation Tomorrow Survey} provides sufficient information to
 infer the zone of origin and destination of all bicycle trips in
 Hamilton using centroids of the traffic zones. Built environment
@@ -418,9 +391,9 @@ destinations, which can be considered when calculating the cost (i.e.,
 in terms of distance and time) of undertaking trips.
 
 Spatial interaction models operate on principles of propulsion,
-attraction, and the friction of space (Rodrigue 2020). In other words,
-we can assume that there are factors within a particular geographic area
-that contribute to producing or generating trips, such as residential or
+attraction, and the friction of space (Rodrigue 2020). We can assume
+that there are factors within a particular geographic area that
+contribute to producing or generating trips, such as residential or
 population density, and there are factors in other geographic areas that
 attract trips like jobs or amenities. Finally, there is the friction of
 space, in other words, the cost incurred in reaching a destination from
@@ -450,8 +423,8 @@ specification of the gravity model estimates the level of flows based on
 explanatory variables at the origin and destination (Griffith and
 Fischer 2016). This regression model is also suitable for datasets that
 contain true zero counts (Griffith 2011), as is the case when many zones
-of origin and destination do not generate trips. The model Poisson model
-is: \begin{equation}
+of origin and destination do not generate trips. The Poisson model is:
+\begin{equation}
 \label{eq:poisson-model}
 P(U_{ij}|x,\theta) = \frac{\lambda^U_{ij}}{U_{ij}!}e^{-\lambda} 
 \end{equation}
@@ -500,7 +473,7 @@ statistic (see Jacqmin-Gadda et al. 1997) is recommended for
 applications in spatial interaction modelling (Chun 2008; Metulini,
 Patuelli, and Griffith 2018).
 
-The \(T\) statistic derived by Jacqmin-Gadda et al. (1997) has the
+The \(T\) statistic derived by Jacqmin-Gadda et al.~(1997) has the
 following equation: \begin{equation}
 \label{eq:T-statistic}
 T = \sum_{i=1}^{N} \sum_{j\ne{i}}^{N} w_{ij}(Y_i - \hat{\mu_i})(Y_j - \hat{\mu_j})
@@ -539,7 +512,7 @@ an annual increase of 1-2\% for the entire network.
 \caption{\label{fig:context-plot} Traffic analysis zones in Hamilton's
 census metropolitan area that generated at least one bicycle trip are
 outlined in black. The Niagara Escarpment, which can be as high as 100
-metres in many places, is outlined in dark blue.)}
+metres in many places, is outlined in dark blue.}
 \end{figure}
 
 \begin{figure}
@@ -723,7 +696,7 @@ forced to pick busy routes.'' Thus, the overall quietness is defined as
 the total length of the segment divided by the total busyness. The
 algorithm tries to minimize the \emph{busyness} which means that the
 inferred route ``may not always be the quietest - but always the least
-busy.'' However, there is a lack of transparency with respect to the
+busy''. However, there is a lack of transparency with respect to the
 speed limit used for calculating the time of each route, which the
 algorithm also seeks to minimize, and the specific attributes that are
 considered by the algorithm when minimizing \emph{busyness}. Quietness
@@ -1028,10 +1001,10 @@ Skov-Petersen 2018; Nordengen et al. 2019; Schneider and Stefanich 2015;
 Winters et al. 2010), in our analysis we find a negative effect of
 population density in terms of both producing and attracting trips by
 bicycle. Scott and Ciuro similarly found that population density around
-bike share hubs in Hamilton does not influence ridership (Darren M.
-Scott and Ciuro 2019). It is possible that this is due to the relatively
-low population density of Hamilton in general. In contrast, availability
-of jobs at the destination was a positive attractor of bicycle trips.
+bike share hubs in Hamilton does not influence ridership (Scott and
+Ciuro 2019). It is possible that this is due to the relatively low
+population density of Hamilton in general. In contrast, availability of
+jobs at the destination was a positive attractor of bicycle trips.
 
 The model also uncovered a positive relationship between number of trips
 and different land uses at the destination: institution, industry,
@@ -1045,11 +1018,11 @@ lower interaction within the escarpment/suburban/rural compared to the
 lower city. The presence of the Niagara Escarpment, in particular,
 echoes other studies that have found that elevation at the destination
 or changes in slope can deter travel by bicycle (e.g., Broach, Dill, and
-Gliebe 2012; Cole-Hunter et al. 2015; Darren M. Scott, Lu, and Brown
-2021). In the case of Hamilton, the Escarpment is a significant change
-in slope. The physical cost of travelling up and down an escarpment, in
-addition to longer trip distances, can help to explain why there are few
-trips between the two distinct areas of the city.
+Gliebe 2012; Cole-Hunter et al. 2015; Scott, Lu, and Brown 2021). In the
+case of Hamilton, the Escarpment is a significant change in slope. The
+physical cost of travelling up and down an escarpment, in addition to
+longer trip distances, can help to explain why there are few trips
+between the two distinct areas of the city.
 
 The findings from this study offer important information to
 transportation planners in similar mid-sized Canadian cities,
@@ -1060,14 +1033,14 @@ continuation or expansion of existing cycling interventions. In the case
 of Hamilton, our findings confirm that the city's recent implementation
 of a ``Mountain Climber'' program, which allows bicyclists to put their
 bike on local buses and travel up and down the escarpment for free
-(Hamilton 2019, July 12), is an appropriate solution to support more
-cycling trips between the two broad regions in the city.
+(Hamilton, n.d.), is an appropriate solution to support more cycling
+trips between the two broad regions in the city.
 
 \hypertarget{inferred-routes}{%
 \subsection{Inferred Routes}\label{inferred-routes}}
 
 Another key contribution of this paper is the use of an open source
-novel routing algorithm, \emph{CycleStreets} to derive cost variables
+novel routing algorithm, \emph{CycleStreets}, to derive cost variables
 for spatial interaction modelling instead of using shortest path
 algorithms. To the best of our knowledge, this is the first North
 American study that uses the \emph{CycleStreets} algorithm in
@@ -1105,7 +1078,7 @@ we cannot know with complete certainty which routes were actually used
 by individual bicyclists, by exploring different types of routes in our
 models we are able to provide statistical support for \emph{quietest}
 routes that minimize distance - a finding in line with bike share
-results reported by Lu et al. (2018).
+results reported by Lu et al.~(2018).
 
 Inferring the route traveled between zones of origin and destination
 using routing algorithms is an important method to account for route
@@ -1115,16 +1088,16 @@ more informative than using the shortest path which may not reflect the
 true behaviour of bicyclists in Hamilton who are known to avoid direct
 routes and to detour for streets with infrastructure (Lu, Scott, and
 Dalumpines 2018). Other studies have used GIS (Cole-Hunter et al. 2015;
-Winters et al. 2010), GPS data (Chen, Shen, and Childress 2018; Jennifer
-Dill 2009; Lu, Scott, and Dalumpines 2018; Skov-Petersen et al. 2018),
-or new methods using crowd-sourced data (McArthur and Hong 2019; Sarjala
-2019) to measure or approximate the built environment along routes
-traveled by bicyclists. However, GPS data are typically available only
-for small samples or under limited conditions, such as with bike share
-trips in Hamilton (Lu, Scott, and Dalumpines 2018), that may not cover
-the full geographical extent of travel by bicycle in a region. Ideally,
-more sophisticated spatial interaction or trip distribution models could
-be developed with routing algorithms that better incorporate and reflect
+Winters et al. 2010), GPS data (Chen, Shen, and Childress 2018; Dill
+2009; Lu, Scott, and Dalumpines 2018; Skov-Petersen et al. 2018), or new
+methods using crowd-sourced data (McArthur and Hong 2019; Sarjala 2019)
+to measure or approximate the built environment along routes traveled by
+bicyclists. However, GPS data are typically available only for small
+samples or under limited conditions, such as with bike share trips in
+Hamilton (Lu, Scott, and Dalumpines 2018), that may not cover the full
+geographical extent of travel by bicycle in a region. Ideally, more
+sophisticated spatial interaction or trip distribution models could be
+developed with routing algorithms that better incorporate and reflect
 preferences at the local level. This is where open source tools for
 geographic analysis have a greater role to play.
 
@@ -1133,12 +1106,12 @@ of a cost variable in an inexpensive way when such data is generally not
 available from travel surveys, including the \emph{Transportation
 Tomorrow Survey}. They do not require a proprietary license and can be
 used to enhance citizen participation in the transportation planning
-process (Lovelace 2021). Broach et al. (2012) noted that in many cases
+process (Lovelace 2021). Broach et al.~(2012) noted that in many cases
 the conventional travel demand model does not address cycling well for
 several reasons. Cycling is often combined with walking since they are
 both active modes and it is often excluded after the second step of the
 travel demand model, meaning that route choice and network assignment
-are not accounted for. Chen at al. (2018) touch upon this as well by
+are not accounted for. Chen at al.~(2018) touch upon this as well by
 suggesting that data about route choice is needed to overcome these
 limitations. Common approaches of including only the shortest path route
 between origins and destinations when accounting for cycling in a travel
@@ -1233,27 +1206,26 @@ which represent travel in a westward direction. The zone of destination
 for 3 of the 4 trip flows includes the university which is a major
 employment and educational institution, and thus acts as a strong push
 and pull factor for trips. This was identified with bike share trips in
-Hamilton as well (Darren M. Scott and Ciuro 2019). Schneider et al.
-(2015) also found that neighbourhoods with high levels of commute trips
-by bicycle are located near a university campus. This suggests that
-universities can attract a large number of trips. Upon further
-investigation, the \emph{Enhanced Points of Interest} dataset catalogues
-each different building and unit within the university, meaning that
-there are several hundred destinations within the traffic zone. The
-count may have skewed the relative influence of the university by
-indicating more potential destinations, instead of one institution,
-leading to over-estimation. The zone of destination for the other trip
-flow was also near the university, however the over-estimation was
-almost negligible. When analyzing the \emph{quietest} distance routes
-for the O-D pairs that end at the traffic zone with the university, each
-route would require a cyclist to cross a major highway or travel along
-an arterial road. At the route level, road networks with fewer highways
-or arterial roads have been found to increase the likelihood of making a
-trip by bicycle (Winters et al. 2010; Zhao 2014). Although we were able
-to provide statistical support for \emph{quietest} routes that minimize
-distance, there are still roads and intersections in Hamilton that
-cannot be avoided and that still feature along routes that are less busy
-overall.
+Hamilton as well (Scott and Ciuro 2019). Schneider et al.~(2015) also
+found that neighbourhoods with high levels of commute trips by bicycle
+are located near a university campus. This suggests that universities
+can attract a large number of trips. Upon further investigation, the
+\emph{Enhanced Points of Interest} dataset catalogues each different
+building and unit within the university, meaning that there are several
+hundred destinations within the traffic zone. The count may have skewed
+the relative influence of the university by indicating more potential
+destinations, instead of one institution, leading to over-estimation.
+The zone of destination for the other trip flow was also near the
+university, however the over-estimation was almost negligible. When
+analyzing the \emph{quietest} distance routes for the O-D pairs that end
+at the traffic zone with the university, each route would require a
+cyclist to cross a major highway or travel along an arterial road. At
+the route level, road networks with fewer highways or arterial roads
+have been found to increase the likelihood of making a trip by bicycle
+(Winters et al. 2010; Zhao 2014). Although we were able to provide
+statistical support for \emph{quietest} routes that minimize distance,
+there are still roads and intersections in Hamilton that cannot be
+avoided and that still feature along routes that are less busy overall.
 
 \begin{figure}
 \centering
@@ -1342,21 +1314,21 @@ indicates that it sufficiently explains the observed pattern, the
 findings may overemphasize the trip patterns of experienced cyclists.
 Hamilton's cycling mode share is 1.2\% which means that it's highly
 likely that bicyclists in the city at this time are ``strong and
-fearless'' or ``enthused and confident'' riders (Geller 2006). This
+fearless'' or ``enthused and confident'' riders (see Geller 2006). This
 hypothesis is supported by the finding that approximately 21\% of
 under-estimated trip flows were between 5 and 25 kilometres, which is
 longer than the conventional bikeable distance. New or inexperienced
 bicyclists would probably be uncomfortable travelling for such long
 distances. The \emph{CycleStreets}
 documentation\footnote{https://CRAN.R-project.org/package=cyclestreets}
-acknowledges that these routes ``emulate the routes taken by a
-knowledgeable cyclist.'' This means that the inferred routes used as a
-cost variable in our model may only be appealing to bicyclists who are
-experienced and potentially more comfortable navigating a developing
-cycling city with a fragmented cycle network. In this respect, the
-\emph{quietest-distance} routes that best explained the pattern of
-cycling flows in Hamilton may not represent routes that would be
-considered ``quiet'' or safe enough by groups that are often
+acknowledges that routes inferred by the algorithm ``emulate the routes
+taken by a knowledgeable cyclist''. This means that the inferred routes
+used as a cost variable in our model may only be appealing to bicyclists
+who are experienced and potentially more comfortable navigating a
+developing cycling city with a fragmented cycle network. In this
+respect, the \emph{quietest-distance} routes that best explained the
+pattern of cycling flows in Hamilton may not represent routes that would
+be considered ``quiet'' or safe enough by groups that are often
 underrepresented in cycling such as women, children, and older adults.
 
 \emph{CycleStreets} can infer a maximum of six routes that are rated
@@ -1368,7 +1340,7 @@ There are other routes or combinations of routes that incorporate
 existing infrastructure which reflect individual tolerance mixing with
 traffic or infrastructure preferences. Routes travelled by the ``strong
 and fearless'' are not necessarily the same as routes travelled the
-``interested but concerned.'' Therefore, one of the limitations of using
+``interested but concerned''. Therefore, one of the limitations of using
 an open source routing algorithm is that it does not currently consider
 route preferences of bicyclists in Hamilton. However, it does give
 streets with infrastructure a higher \emph{quietest} percentage score,
@@ -1435,375 +1407,370 @@ publication{]}.
 
 The authors wish to express their gratitude to Yongwan Chun and Roberto
 Patuelli for sharing their \texttt{R} code for the Jacqmin-Gadda's \(T\)
-test. In addition, the following \texttt{R} packages were used in the
-course of this investigation and the authors wish to acknowledge their
-developers: \texttt{cyclestreets} (Lovelace and Lucas-Smith 2018),
-\texttt{ggthemes} (Arnold 2019), \texttt{kableExtra} (Zhu 2019),
-\texttt{knitr}(Xie 2014, 2015), \texttt{rticles} (Allaire et al. 2020),
-\texttt{sf} (Pebesma 2018), \texttt{spdep} (Bivand, Pebesma, and
-Gomez-Rubio 2013), \texttt{tidyverse} (Wickham et al. 2019),
-\texttt{units} (Pebesma, Mailund, and Hiebert 2016), and
-\texttt{zeligverse} (Gandrud 2017).
+test. The authors would also like to thank the three anonymous reviewers
+for their constructive feedback. In addition, the following \texttt{R}
+packages were used in the course of this investigation and the authors
+wish to acknowledge their developers: \texttt{cyclestreets} (Lovelace
+and Lucas-Smith 2018), \texttt{ggthemes} (Arnold 2019),
+\texttt{kableExtra} (Zhu 2019), \texttt{knitr}(Xie 2014, 2015),
+\texttt{rticles} (Allaire et al. 2020), \texttt{sf} (Pebesma 2018),
+\texttt{spdep} (Bivand, Pebesma, and Gomez-Rubio 2013),
+\texttt{tidyverse} (Wickham et al. 2019), \texttt{units} (Pebesma,
+Mailund, and Hiebert 2016), and \texttt{zeligverse} (Gandrud 2017).
 
 \hypertarget{references}{%
 \section*{References}\label{references}}
 \addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
-\begin{CSLReferences}{1}{0}
 \leavevmode\hypertarget{ref-Adam2020}{}%
-Adam, Lukas, Tim Jones, and Marco te Brömmelstroet. 2020. {``Planning
-for Cycling in the Dispersed City: Establishing a Hierarchy of
-Effectiveness of Municipal Cycling Policies.''} \emph{Transportation} 47
-(2): 503--27. \url{https://doi.org/10.1007/s11116-018-9878-3}.
+Adam, Lukas, Tim Jones, and Marco te Brömmelstroet. 2020. ``Planning for
+Cycling in the Dispersed City: Establishing a Hierarchy of Effectiveness
+of Municipal Cycling Policies.'' \emph{Transportation} 47 (2): 503--27.
+\url{https://doi.org/10.1007/s11116-018-9878-3}.
 
 \leavevmode\hypertarget{ref-Allaire2020}{}%
 Allaire, JJ, Yihui Xie, R Foundation, Hadley Wickham, Journal of
 Statistical Software, Ramnath Vaidyanathan, Association for Computing
-Machinery, et al. 2020. \emph{Rticles: {Article} Formats for r
-Markdown}. Manual.
+Machinery, et al. 2020. \emph{Rticles: Article Formats for R Markdown}.
+Manual.
 
 \leavevmode\hypertarget{ref-Arnold2019}{}%
-Arnold, Jeffrey B. 2019. \emph{Ggthemes: {Extra} Themes, Scales and
-Geoms for 'Ggplot2'}. Manual.
+Arnold, Jeffrey B. 2019. \emph{Ggthemes: Extra Themes, Scales and Geoms
+for 'Ggplot2'}. Manual.
 
 \leavevmode\hypertarget{ref-Assuncao2019}{}%
-Assunçao-Denis, Marie-Ève, and Ray Tomalty. 2019. {``Increasing Cycling
-for Transportation in {Canadian} Communities: {Understanding} What
-Works.''} \emph{Transportation Research Part A: Policy and Practice} 123
-(May): 288--304. \url{https://doi.org/10.1016/j.tra.2018.11.010}.
+Assunçao-Denis, Marie-Ève, and Ray Tomalty. 2019. ``Increasing Cycling
+for Transportation in Canadian Communities: Understanding What Works.''
+\emph{Transportation Research Part A: Policy and Practice} 123 (May):
+288--304. \url{https://doi.org/10.1016/j.tra.2018.11.010}.
 
 \leavevmode\hypertarget{ref-Avila2018}{}%
 Avila-Palencia, I, L Int Panis, E Dons, and M et al. Gaupp-Berghausen.
-2018. {``The Effects of Transport Mode Use on Self-Perceived Health,
-Mental Health, and Social Contact Measures: {A} Cross-Sectional and
-Longitudinal Study.''} Journal Article. \emph{Environment International}
+2018. ``The Effects of Transport Mode Use on Self-Perceived Health,
+Mental Health, and Social Contact Measures: A Cross-Sectional and
+Longitudinal Study.'' Journal Article. \emph{Environment International}
 120: 199--206. \url{https://doi.org/10.1016/j.envint.2018.08.002}.
 
 \leavevmode\hypertarget{ref-Bivand2013}{}%
 Bivand, Roger S., Edzer Pebesma, and Virgilio Gomez-Rubio. 2013.
-\emph{Applied Spatial Data Analysis with {R}, {Second} Edition}.
-{Springer, NY}.
+\emph{Applied Spatial Data Analysis with R, Second Edition}. Springer,
+NY.
 
 \leavevmode\hypertarget{ref-Branion2019}{}%
 Branion-Calles, Michael, Trisalyn Nelson, Daniel Fuller, Lise Gauvin,
-and Meghan Winters. 2019. {``Associations Between Individual
+and Meghan Winters. 2019. ``Associations Between Individual
 Characteristics, Availability of Bicycle Infrastructure, and City-Wide
-Safety Perceptions of Bicycling: {A} Cross-Sectional Survey of
-Bicyclists in 6 {Canadian} and {U}.{S}. Cities.''} \emph{Transportation
-Research Part A: Policy and Practice} 123 (May): 229--39.
+Safety Perceptions of Bicycling: A Cross-Sectional Survey of Bicyclists
+in 6 Canadian and U.S. Cities.'' \emph{Transportation Research Part A:
+Policy and Practice} 123 (May): 229--39.
 \url{https://doi.org/10.1016/j.tra.2018.10.024}.
 
 \leavevmode\hypertarget{ref-Broach2012}{}%
-Broach, Joseph, Jennifer Dill, and John Gliebe. 2012. {``Where Do
-Cyclists Ride? {A} Route Choice Model Developed with Revealed Preference
-{GPS} Data.''} \emph{Transportation Research Part A: Policy and
-Practice} 46 (10): 1730--40.
-\url{https://doi.org/10.1016/j.tra.2012.07.005}.
+Broach, Joseph, Jennifer Dill, and John Gliebe. 2012. ``Where Do
+Cyclists Ride? A Route Choice Model Developed with Revealed Preference
+GPS Data.'' \emph{Transportation Research Part A: Policy and Practice}
+46 (10): 1730--40. \url{https://doi.org/10.1016/j.tra.2012.07.005}.
 
 \leavevmode\hypertarget{ref-brunsdon2020opening}{}%
-Brunsdon, Chris, and Alexis Comber. 2020. {``Opening Practice:
-Supporting Reproducibility and Critical Spatial Data Science.''}
-\emph{Journal of Geographical Systems}, 1--20.
+Brunsdon, Chris, and Alexis Comber. 2020. ``Opening Practice: Supporting
+Reproducibility and Critical Spatial Data Science.'' \emph{Journal of
+Geographical Systems}, 1--20.
 \url{https://doi.org/10.1007/s10109-020-00334-2}.
 
 \leavevmode\hypertarget{ref-Buehler2016}{}%
-Buehler, Ralph, and Jennifer Dill. 2016. {``Bikeway Networks: {A} Review
-of Effects on Cycling.''} \emph{Transport Reviews} 36 (1): 9--27.
+Buehler, Ralph, and Jennifer Dill. 2016. ``Bikeway Networks: A Review of
+Effects on Cycling.'' \emph{Transport Reviews} 36 (1): 9--27.
 \url{https://doi.org/10.1080/01441647.2015.1069908}.
 
 \leavevmode\hypertarget{ref-Buehler2012}{}%
-Buehler, Ralph, and John Pucher. 2012. {``Cycling to Work in 90 Large
-{American} Cities: New Evidence on the Role of Bike Paths and Lanes.''}
+Buehler, Ralph, and John Pucher. 2012. ``Cycling to Work in 90 Large
+American Cities: New Evidence on the Role of Bike Paths and Lanes.''
 \emph{Transportation} 39 (2): 409--32.
 \url{https://doi.org/10.1007/s11116-011-9355-8}.
 
 \leavevmode\hypertarget{ref-Celis2017}{}%
-Celis-Morales, CA, DM Lyall, and P et al. Welsh. 2017. {``Association
+Celis-Morales, CA, DM Lyall, and P et al. Welsh. 2017. ``Association
 Between Active Commuting and Incident Cardiovascular Disease, Cancer,
-and Mortality: Prospective Cohort Study.''} Journal Article. \emph{BMJ
+and Mortality: Prospective Cohort Study.'' Journal Article. \emph{BMJ
 (Clinical Research Ed.)} 357: j1456.
 \url{https://doi.org/10.1136/bmj.j1456}.
 
 \leavevmode\hypertarget{ref-Cervero2019}{}%
-Cervero, Robert, Steve Denman, and Ying Jin. 2019. {``Network Design,
-Built and Natural Environments, and Bicycle Commuting: {Evidence} from
-{British} Cities and Towns.''} \emph{Transport Policy} 74 (February):
+Cervero, Robert, Steve Denman, and Ying Jin. 2019. ``Network Design,
+Built and Natural Environments, and Bicycle Commuting: Evidence from
+British Cities and Towns.'' \emph{Transport Policy} 74 (February):
 153--64. \url{https://doi.org/10.1016/j.tranpol.2018.09.007}.
 
 \leavevmode\hypertarget{ref-Chen2018}{}%
-Chen, Peng, Qing Shen, and Suzanne Childress. 2018. {``A {GPS}
-Data-Based Analysis of Built Environment Influences on Bicyclist Route
-Preferences.''} \emph{International Journal of Sustainable
+Chen, Peng, Qing Shen, and Suzanne Childress. 2018. ``A GPS Data-Based
+Analysis of Built Environment Influences on Bicyclist Route
+Preferences.'' \emph{International Journal of Sustainable
 Transportation} 12 (3): 218--31.
 \url{https://doi.org/10.1080/15568318.2017.1349222}.
 
 \leavevmode\hypertarget{ref-Chun2008}{}%
-Chun, Yongwan. 2008. {``Modeling Network Autocorrelation Within
-Migration Flows by Eigenvector Spatial Filtering.''} \emph{Journal of
-Geographical Systems} 10 (4): 317--44.
+Chun, Yongwan. 2008. ``Modeling Network Autocorrelation Within Migration
+Flows by Eigenvector Spatial Filtering.'' \emph{Journal of Geographical
+Systems} 10 (4): 317--44.
 \url{https://doi.org/10.1007/s10109-008-0068-2}.
 
 \leavevmode\hypertarget{ref-Calgary2011}{}%
-City of Calgary. 2011. {``Cycling Strategy.''}
+City of Calgary. 2011. ``Cycling Strategy.''
 https://www.calgary.ca/Transportation/TP/Documents/cycling/Cycling-Strategy/2011-cycling-strategy-presentation.pdf.
 
 \leavevmode\hypertarget{ref-Tmp2018}{}%
-City of Hamilton. 2018a. {``City of Hamilton Transportation Master Plan
-Review and Update.''}
+City of Hamilton. 2018a. ``City of Hamilton Transportation Master Plan
+Review and Update.''
 https://www.hamilton.ca/sites/default/files/media/browser/2018-10-24/tmp-review-update-final-report-oct2018.pdf.
 
 \leavevmode\hypertarget{ref-Cmp2018}{}%
----------. 2018b. {``Cycling Master Plan Review and Update.''}
+---------. 2018b. ``Cycling Master Plan Review and Update.''
 https://www.hamilton.ca/sites/default/files/media/browser/2018-06-06/draft-tmp-backgroundreport-cyclingmp-11-1.pdf.
 
 \leavevmode\hypertarget{ref-Cmp2009}{}%
----------. 2018c. {``Shifting Gears 2009: {Hamilton}'s Cycling Master
-Plan Review and Update.''}
+---------. 2018c. ``Shifting Gears 2009: Hamilton's Cycling Master Plan
+Review and Update.''
 https://www.hamilton.ca/sites/default/files/media/browser/2014-12-17/cycling-master-plan-chapters-1-2-3.pdf.
 
 \leavevmode\hypertarget{ref-Montreal2017}{}%
-City of Montreal. 2017. {``Montreal, City of Cyclists; Cycling Master
-Plan: {Safety}, Efficiency, Audacity.''}
+City of Montreal. 2017. ``Montreal, City of Cyclists; Cycling Master
+Plan: Safety, Efficiency, Audacity.''
 https://ville.montreal.qc.ca/pls/portal/docs/page/transports\_fr/media/documents/plan\_cadre\_velo\_ang\_final\_lr.pdf.
 
 \leavevmode\hypertarget{ref-Vancouver2012}{}%
-City of Vancouver. 2012. {``Transportation 2040: {Moving} Forward.''}
+City of Vancouver. 2012. ``Transportation 2040: Moving Forward.''
 https://vancouver.ca/files/cov/transportation-2040-plan.pdf.
 
 \leavevmode\hypertarget{ref-ColeHunter2015}{}%
 Cole-Hunter, T, D Donaire-Gonzalez, A Curto, A Ambros, A Valentin, J
-Garcia-Aymerich, D Martínez, et al. 2015. {``Objective Correlates and
-Determinants of Bicycle Commuting Propensity in an Urban Environment.''}
+Garcia-Aymerich, D Martínez, et al. 2015. ``Objective Correlates and
+Determinants of Bicycle Commuting Propensity in an Urban Environment.''
 \emph{Transportation Research Part D: Transport and Environment} 40
 (October): 132--43. \url{https://doi.org/10.1016/j.trd.2015.07.004}.
 
 \leavevmode\hypertarget{ref-Dmg2014tts}{}%
-Data Management Group. 2014. {``2011 {TTS}: {Design} and Conduct of the
-Survey.''} http://dmg.utoronto.ca/pdf/tts/2011/conduct2011.pdf.
+Data Management Group. 2014. ``2011 TTS: Design and Conduct of the
+Survey.'' http://dmg.utoronto.ca/pdf/tts/2011/conduct2011.pdf.
 
 \leavevmode\hypertarget{ref-Dmg2018tts}{}%
----------. 2018. {``2016 {TTS}: {Design} and Conduct of the Survey.''}
+---------. 2018. ``2016 TTS: Design and Conduct of the Survey.''
 http://dmg.utoronto.ca/pdf/tts/2016/2016TTS\_Conduct.pdf.
 
 \leavevmode\hypertarget{ref-deNazelle2011}{}%
 De Nazelle, Audrey, Mark J Nieuwenhuijsen, Josep M Antó, Michael Brauer,
 David Briggs, Charlotte Braun-Fahrlander, Nick Cavill, et al. 2011.
-{``Improving Health Through Policies That Promote Active Travel: A
-Review of Evidence to Support Integrated Health Impact Assessment.''}
+``Improving Health Through Policies That Promote Active Travel: A Review
+of Evidence to Support Integrated Health Impact Assessment.''
 \emph{Environment International} 37 (4): 766--77.
 
 \leavevmode\hypertarget{ref-Dill2003}{}%
-Dill, J, and T Carr. 2003. {``Bicycle Commuting and Facilities in Major
-{U}.{S}. Cities: {If} You Build Them, Commuters Will Use Them.''}
-Journal Article. \emph{Transportation Research Record: Journal of the
+Dill, J, and T Carr. 2003. ``Bicycle Commuting and Facilities in Major
+U.S. Cities: If You Build Them, Commuters Will Use Them.'' Journal
+Article. \emph{Transportation Research Record: Journal of the
 Transportation Research Board} 1828.
 
 \leavevmode\hypertarget{ref-Dill2009}{}%
-Dill, Jennifer. 2009. {``Bicycling for Transportation and Health: {The}
-Role of Infrastructure.''} \emph{Journal of Public Health Policy} 30
-(S1): S95--110. \url{https://doi.org/10.1057/jphp.2008.56}.
+Dill, Jennifer. 2009. ``Bicycling for Transportation and Health: The
+Role of Infrastructure.'' \emph{Journal of Public Health Policy} 30
+(S1): S95--S110. \url{https://doi.org/10.1057/jphp.2008.56}.
 
 \leavevmode\hypertarget{ref-deDios2011Modelling}{}%
 Dios Ortúzar, Juan de, and Luis G Willumsen. 2011. \emph{Modelling
-Transport}. Fourth. {John wiley \& sons}.
+Transport}. Fourth. John wiley \& sons.
 
 \leavevmode\hypertarget{ref-elAssi2017effects}{}%
 El-Assi, Wafic, Mohamed Salah Mahmoud, and Khandker Nurul Habib. 2017.
-{``Effects of Built Environment and Weather on Bike Sharing Demand: A
-Station Level Analysis of Commercial Bike Sharing in {Toronto}.''}
+``Effects of Built Environment and Weather on Bike Sharing Demand: A
+Station Level Analysis of Commercial Bike Sharing in Toronto.''
 \emph{Transportation} 44 (3): 589--613.
 
 \leavevmode\hypertarget{ref-Gandrud2017}{}%
-Gandrud, Christopher. 2017. \emph{Zeligverse: {Easily} Install and Load
+Gandrud, Christopher. 2017. \emph{Zeligverse: Easily Install and Load
 Stable Zelig Packages}. Manual.
 
 \leavevmode\hypertarget{ref-Geller2006}{}%
-Geller, Roger. 2006. {``Four Types of Cyclists.''}
+Geller, Roger. 2006. ``Four Types of Cyclists.''
 https://www.portlandoregon.gov/transportation/44597?a=237507.
 
 \leavevmode\hypertarget{ref-Griffith2011}{}%
-Griffith, Daniel A. 2011. {``Visualizing Analytical Spatial
-Autocorrelation Components Latent in Spatial Interaction Data: {An}
-Eigenvector Spatial Filter Approach.''} \emph{Computers, Environment and
+Griffith, Daniel A. 2011. ``Visualizing Analytical Spatial
+Autocorrelation Components Latent in Spatial Interaction Data: An
+Eigenvector Spatial Filter Approach.'' \emph{Computers, Environment and
 Urban Systems} 35 (2): 140--49.
 \url{https://doi.org/10.1016/j.compenvurbsys.2010.08.003}.
 
 \leavevmode\hypertarget{ref-griffithConstrainedVariantsGravity2016}{}%
-Griffith, Daniel A., and Manfred M. Fischer. 2016. {``Constrained
-{Variants} of the {Gravity Model} and {Spatial Dependence}: {Model
-Specification} and {Estimation Issues}.''} In \emph{Spatial {Econometric
-Interaction Modelling}}, edited by Roberto Patuelli and Giuseppe Arbia,
-37--66. Advances in {Spatial Science}. {Cham}: {Springer International
-Publishing}. \url{https://doi.org/10.1007/978-3-319-30196-9_3}.
+Griffith, Daniel A., and Manfred M. Fischer. 2016. ``Constrained
+Variants of the Gravity Model and Spatial Dependence: Model
+Specification and Estimation Issues.'' In \emph{Spatial Econometric
+Interaction Modelling}, edited by Roberto Patuelli and Giuseppe Arbia,
+37--66. Advances in Spatial Science. Cham: Springer International
+Publishing. \url{https://doi.org/10.1007/978-3-319-30196-9_3}.
 
 \leavevmode\hypertarget{ref-Hamilton2019}{}%
-Hamilton, City of. 2019, July 12. {``Mountain Climber Pilot Program
-Expanded.''}
+Hamilton, City of. n.d. ``Mountain Climber Pilot Program Expanded.''
 https://www.hamilton.ca/government-information/news-centre/news-releases/mountain-climber-pilot-program-expanded.
 
 \leavevmode\hypertarget{ref-handyMakingUSCities2020}{}%
-Handy, Susan. 2020. {``Making {US} Cities Pedestrian- and
-Bicycle-Friendly.''} In \emph{Transportation, {Land Use}, and
-{Environmental Planning}}, edited by Elizabeth Deakin, 169--87.
-{Elsevier}. \url{https://doi.org/10.1016/B978-0-12-815167-9.00009-8}.
+Handy, Susan. 2020. ``Making US Cities Pedestrian- and
+Bicycle-Friendly.'' In \emph{Transportation, Land Use, and Environmental
+Planning}, edited by Elizabeth Deakin, 169--87. Elsevier.
+\url{https://doi.org/10.1016/B978-0-12-815167-9.00009-8}.
 
 \leavevmode\hypertarget{ref-handyPromotingCyclingTransport2014}{}%
-Handy, Susan, Bert van Wee, and Maarten Kroesen. 2014. {``Promoting
-Cycling for Transport: {Research} Needs and Challenges.''}
-\emph{Transport Reviews} 34: 4--24.
+Handy, Susan, Bert van Wee, and Maarten Kroesen. 2014. ``Promoting
+Cycling for Transport: Research Needs and Challenges.'' \emph{Transport
+Reviews} 34: 4--24.
 
 \leavevmode\hypertarget{ref-Heesch2015}{}%
 Heesch, Kristiann C., Billie Giles-Corti, and Gavin Turrell. 2015.
-{``Cycling for Transport and Recreation: {Associations} with the
-Socio-Economic, Natural and Built Environment.''} \emph{Health \& Place}
+``Cycling for Transport and Recreation: Associations with the
+Socio-Economic, Natural and Built Environment.'' \emph{Health \& Place}
 36 (November): 152--61.
 \url{https://doi.org/10.1016/j.healthplace.2015.10.004}.
 
 \leavevmode\hypertarget{ref-heinenCommutingBicycleOverview2010}{}%
-Heinen, Eva, Bert van Wee, and Kees Maat. 2010. {``Commuting by Bicycle:
-{An} Overview of the Literature.''} \emph{Transport Reviews} 30: 59--96.
+Heinen, Eva, Bert van Wee, and Kees Maat. 2010. ``Commuting by Bicycle:
+An Overview of the Literature.'' \emph{Transport Reviews} 30: 59--96.
 
 \leavevmode\hypertarget{ref-Jacqmin1997}{}%
 Jacqmin-Gadda, Hélène, Daniel Commenges, Chakib Nejjari, and
-Jean-François Dartigues. 1997. {``Tests of Geographical Correlation with
+Jean-François Dartigues. 1997. ``Tests of Geographical Correlation with
 Adjustment for Explanatory Variables: An Application to Dyspnoea in the
-Elderly.''} \emph{Statistics in Medicine} 16 (11): 1283--97.
+Elderly.'' \emph{Statistics in Medicine} 16 (11): 1283--97.
 
 \leavevmode\hypertarget{ref-Le2018}{}%
-Le, Huyen T. K., Ralph Buehler, and Steve Hankey. 2018. {``Correlates of
-the Built Environment and Active Travel: {Evidence} from 20 {US}
-Metropolitan Areas.''} \emph{Environmental Health Perspectives} 126 (7):
+Le, Huyen T. K., Ralph Buehler, and Steve Hankey. 2018. ``Correlates of
+the Built Environment and Active Travel: Evidence from 20 US
+Metropolitan Areas.'' \emph{Environmental Health Perspectives} 126 (7):
 077011. \url{https://doi.org/10.1289/EHP3389}.
 
 \leavevmode\hypertarget{ref-liuWhatMakesGood2020}{}%
 Liu, George, Samuel Nello-Deakin, Marco Brommelstroet te, and Yuki
-Yamamoto. 2020. {``What Makes a Good Cargo Bike Route? {Perspectives}
-from Users and Planners.''} \emph{American Journal of Economics and
-Sociology} 73: 941--65. \url{https://doi.org/10.1111/ajes.12332}.
+Yamamoto. 2020. ``What Makes a Good Cargo Bike Route? Perspectives from
+Users and Planners.'' \emph{American Journal of Economics and Sociology}
+73: 941--65. \url{https://doi.org/10.1111/ajes.12332}.
 
 \leavevmode\hypertarget{ref-lovelaceOpenSourceTools2021}{}%
-Lovelace, Robin. 2021. {``Open Source Tools for Geographic Analysis in
-Transport Planning.''} \emph{Journal of Geographical Systems}, January.
+Lovelace, Robin. 2021. ``Open Source Tools for Geographic Analysis in
+Transport Planning.'' \emph{Journal of Geographical Systems}, January.
 \url{https://doi.org/10.1007/s10109-020-00342-2}.
 
 \leavevmode\hypertarget{ref-Lovelace2018}{}%
-Lovelace, Robin, and Martin Lucas-Smith. 2018. \emph{Cyclestreets:
-{Cycle} Routing and Data for Cycling Advocacy}. Manual.
+Lovelace, Robin, and Martin Lucas-Smith. 2018. \emph{Cyclestreets: Cycle
+Routing and Data for Cycling Advocacy}. Manual.
 
 \leavevmode\hypertarget{ref-Lu2018understanding}{}%
-Lu, Wei, Darren M Scott, and Ron Dalumpines. 2018. {``Understanding Bike
-Share Cyclist Route Choice Using {GPS} Data: {Comparing} Dominant Routes
-and Shortest Paths.''} \emph{Journal of Transport Geography} 71:
-172--81.
+Lu, Wei, Darren M Scott, and Ron Dalumpines. 2018. ``Understanding Bike
+Share Cyclist Route Choice Using GPS Data: Comparing Dominant Routes and
+Shortest Paths.'' \emph{Journal of Transport Geography} 71: 172--81.
 
 \leavevmode\hypertarget{ref-McArthur2019}{}%
-McArthur, David Philip, and Jinhyun Hong. 2019. {``Visualising Where
-Commuting Cyclists Travel Using Crowdsourced Data.''} \emph{Journal of
+McArthur, David Philip, and Jinhyun Hong. 2019. ``Visualising Where
+Commuting Cyclists Travel Using Crowdsourced Data.'' \emph{Journal of
 Transport Geography} 74 (January): 233--41.
 \url{https://doi.org/10.1016/j.jtrangeo.2018.11.018}.
 
 \leavevmode\hypertarget{ref-Mertens2017}{}%
 Mertens, Lieze, Sofie Compernolle, Benedicte Deforche, Joreintje D.
 Mackenbach, Jeroen Lakerveld, Johannes Brug, Célina Roda, et al. 2017.
-{``Built Environmental Correlates of Cycling for Transport Across
-{Europe}.''} \emph{Health \& Place} 44 (March): 35--42.
+``Built Environmental Correlates of Cycling for Transport Across
+Europe.'' \emph{Health \& Place} 44 (March): 35--42.
 \url{https://doi.org/10.1016/j.healthplace.2017.01.007}.
 
 \leavevmode\hypertarget{ref-Metulini2018}{}%
-Metulini, Rodolfo, Roberto Patuelli, and Daniel Griffith. 2018. {``A
-{Spatial}-{Filtering Zero}-{Inflated Approach} to the {Estimation} of
-the {Gravity Model} of {Trade}.''} \emph{Econometrics} 6 (1): 9.
+Metulini, Rodolfo, Roberto Patuelli, and Daniel Griffith. 2018. ``A
+Spatial-Filtering Zero-Inflated Approach to the Estimation of the
+Gravity Model of Trade.'' \emph{Econometrics} 6 (1): 9.
 \url{https://doi.org/10.3390/econometrics6010009}.
 
 \leavevmode\hypertarget{ref-Mitra2016}{}%
-Mitra, R, N Smith Lea, I Cantello, and G Hanson. 2016. {``Cycling
-Behaviour and Potential in the Greater Toronto and Hamilton Area.''}
+Mitra, R, N Smith Lea, I Cantello, and G Hanson. 2016. ``Cycling
+Behaviour and Potential in the Greater Toronto and Hamilton Area.''
 http://transformlab.ryerson.ca/wp-content/uploads/2016/10/Cycling-potential-in-GTHA-final-report-2016.pdf.
 
 \leavevmode\hypertarget{ref-Moniruzzaman2012}{}%
-Moniruzzaman, M.d., and A Páez. 2012. {``A Model-Based Approach to
-Select Case Sites for Walkability Audits.''} Journal Article.
-\emph{Health \& Place} 18 (6): 1323--34.
+Moniruzzaman, M.d., and A Páez. 2012. ``A Model-Based Approach to Select
+Case Sites for Walkability Audits.'' Journal Article. \emph{Health \&
+Place} 18 (6): 1323--34.
 \url{https://doi.org/10.1016/j.healthplace.2012.09.013}.
 
 \leavevmode\hypertarget{ref-Moniruzzaman2016}{}%
----------. 2016. {``An Investigation of the Attributes of Walkable
-Environments from the Perspective of Seniors in {Montreal}.''} Journal
+---------. 2016. ``An Investigation of the Attributes of Walkable
+Environments from the Perspective of Seniors in Montreal.'' Journal
 Article. \emph{Journal of Transport Geography} 51: 85--96.
-https://doi.org/\url{http://dx.doi.org/10.1016/j.jtrangeo.2015.12.001}.
+\url{https://doi.org/http://dx.doi.org/10.1016/j.jtrangeo.2015.12.001}.
 
 \leavevmode\hypertarget{ref-Moudon2003walking}{}%
-Moudon, Anne Vernez, and Chanam Lee. 2003. {``Walking and Bicycling: An
-Evaluation of Environmental Audit Instruments.''} \emph{American Journal
+Moudon, Anne Vernez, and Chanam Lee. 2003. ``Walking and Bicycling: An
+Evaluation of Environmental Audit Instruments.'' \emph{American Journal
 of Health Promotion} 18 (1): 21--37.
 
 \leavevmode\hypertarget{ref-moudonCyclingBuiltEnvironment2005a}{}%
 Moudon, Anne Vernez, Chanam Lee, Allen D. Cheadle, Cheza W. Collier,
-Donna Johnson, Thomas L. Schmid, and Robert D. Weather. 2005. {``Cycling
-and the Built Environment, a {US} Perspective.''} \emph{Transportation
+Donna Johnson, Thomas L. Schmid, and Robert D. Weather. 2005. ``Cycling
+and the Built Environment, a US Perspective.'' \emph{Transportation
 Research Part D: Transport and Environment} 10 (3): 245--61.
 
 \leavevmode\hypertarget{ref-Nielsen2018}{}%
 Nielsen, Thomas Alexander Sick, and Hans Skov-Petersen. 2018.
-{``Bikeability {} {Urban} Structures Supporting Cycling. {Effects} of
-Local, Urban and Regional Scale Urban Form Factors on Cycling from Home
-and Workplace Locations in {Denmark}.''} \emph{Journal of Transport
-Geography} 69 (May): 36--44.
-\url{https://doi.org/10.1016/j.jtrangeo.2018.04.015}.
+``Bikeability Urban Structures Supporting Cycling. Effects of Local,
+Urban and Regional Scale Urban Form Factors on Cycling from Home and
+Workplace Locations in Denmark.'' \emph{Journal of Transport Geography}
+69 (May): 36--44. \url{https://doi.org/10.1016/j.jtrangeo.2018.04.015}.
 
 \leavevmode\hypertarget{ref-nolandBikeshareTripGeneration2016}{}%
-Noland, Robert B., Michael J. Smart, and Ziye Guo. 2016. {``Bikeshare
-Trip Generation in New York City.''} \emph{Transportation Research Part
+Noland, Robert B., Michael J. Smart, and Ziye Guo. 2016. ``Bikeshare
+Trip Generation in New York City.'' \emph{Transportation Research Part
 A: Policy and Practice} 94: 164--81.
 \url{https://doi.org/10.1016/j.tra.2016.08.030}.
 
 \leavevmode\hypertarget{ref-Nordengen2019}{}%
-Nordengen, Ruther, Riiser, Andersen, and Solbraa. 2019. {``Correlates of
-{Commuter Cycling} in {Three Norwegian Counties}.''} \emph{International
+Nordengen, Ruther, Riiser, Andersen, and Solbraa. 2019. ``Correlates of
+Commuter Cycling in Three Norwegian Counties.'' \emph{International
 Journal of Environmental Research and Public Health} 16 (22): 4372.
 \url{https://doi.org/10.3390/ijerph16224372}.
 
 \leavevmode\hypertarget{ref-Oja2011}{}%
 Oja, P., S. Titze, A. Bauman, B. de Geus, P. Krenn, B. Reger-Nash, and
-T. Kohlberger. 2011. {``Health Benefits of Cycling: A Systematic
-Review.''} \emph{Scandinavian Journal of Medicine \& Science in Sports}
+T. Kohlberger. 2011. ``Health Benefits of Cycling: A Systematic
+Review.'' \emph{Scandinavian Journal of Medicine \& Science in Sports}
 21 (4): 496--509.
 \url{https://doi.org/10.1111/j.1600-0838.2011.01299.x}.
 
 \leavevmode\hypertarget{ref-paezEnjoymentCommuteComparison2010}{}%
-Páez, Antonio, and Kate Whalen. 2010. {``Enjoyment of Commute: {A}
-Comparison of Different Transportation Modes.''} \emph{Transportation
+Páez, Antonio, and Kate Whalen. 2010. ``Enjoyment of Commute: A
+Comparison of Different Transportation Modes.'' \emph{Transportation
 Research Part A: Policy and Practice} 44 (7): 537--49.
 \url{https://doi.org/10.1016/j.tra.2010.04.003}.
 
 \leavevmode\hypertarget{ref-Pebesma2018}{}%
-Pebesma, Edzer. 2018. {``Simple Features for r: {Standardized} Support
-for Spatial Vector Data.''} \emph{The R Journal} 10 (1): 439--46.
+Pebesma, Edzer. 2018. ``Simple Features for R: Standardized Support for
+Spatial Vector Data.'' \emph{The R Journal} 10 (1): 439--46.
 \url{https://doi.org/10.32614/RJ-2018-009}.
 
 \leavevmode\hypertarget{ref-Pebesma2016}{}%
-Pebesma, Edzer, Thomas Mailund, and James Hiebert. 2016. {``Measurement
-Units in {R}.''} \emph{R Journal} 8 (2): 486--94.
+Pebesma, Edzer, Thomas Mailund, and James Hiebert. 2016. ``Measurement
+Units in R.'' \emph{R Journal} 8 (2): 486--94.
 \url{https://doi.org/10.32614/RJ-2016-061}.
 
 \leavevmode\hypertarget{ref-Pritchard2018}{}%
-Pritchard, Ray. 2018. {``Revealed Preference Methods for Studying
-Bicycle Route Choice - a Systematic Review.''} \emph{International
-Journal of Environmental Research and Public Health} 15 (3): 470.
+Pritchard, Ray. 2018. ``Revealed Preference Methods for Studying Bicycle
+Route Choice - a Systematic Review.'' \emph{International Journal of
+Environmental Research and Public Health} 15 (3): 470.
 \url{https://doi.org/10.3390/ijerph15030470}.
 
 \leavevmode\hypertarget{ref-Pritchard2019}{}%
-Pritchard, Ray, Dominik Bucher, and Yngve Frøyen. 2019. {``Does New
-Bicycle Infrastructure Result in New or Rerouted Bicyclists? {A}
-Longitudinal {GPS} Study in {Oslo}.''} \emph{Journal of Transport
-Geography} 77 (May): 113--25.
-\url{https://doi.org/10.1016/j.jtrangeo.2019.05.005}.
+Pritchard, Ray, Dominik Bucher, and Yngve Frøyen. 2019. ``Does New
+Bicycle Infrastructure Result in New or Rerouted Bicyclists? A
+Longitudinal GPS Study in Oslo.'' \emph{Journal of Transport Geography}
+77 (May): 113--25. \url{https://doi.org/10.1016/j.jtrangeo.2019.05.005}.
 
 \leavevmode\hypertarget{ref-Pucher2006}{}%
-Pucher, John, and Ralph Buehler. 2006. {``Why {Canadians} Cycle More
-Than {Americans}: {A} Comparative Analysis of Bicycling Trends and
-Policies.''} \emph{Transport Policy} 13 (3): 265--79.
+Pucher, John, and Ralph Buehler. 2006. ``Why Canadians Cycle More Than
+Americans: A Comparative Analysis of Bicycling Trends and Policies.''
+\emph{Transport Policy} 13 (3): 265--79.
 \url{https://doi.org/10.1016/j.tranpol.2005.11.001}.
 
 \leavevmode\hypertarget{ref-Rodrigue2020}{}%
@@ -1813,107 +1780,104 @@ Fifth. Routledge.
 \leavevmode\hypertarget{ref-Sallis2013}{}%
 Sallis, James F., Terry L. Conway, Lianne I. Dillon, Lawrence D. Frank,
 Marc A. Adams, Kelli L. Cain, and Brian E. Saelens. 2013.
-{``Environmental and Demographic Correlates of Bicycling.''}
+``Environmental and Demographic Correlates of Bicycling.''
 \emph{Preventive Medicine} 57 (5): 456--60.
 \url{https://doi.org/10.1016/j.ypmed.2013.06.014}.
 
 \leavevmode\hypertarget{ref-Sarjala2019}{}%
-Sarjala, Satu. 2019. {``Built Environment Determinants of Pedestrians'
-and Bicyclists' Route Choices on Commute Trips: {Applying} a New
-Grid-Based Method for Measuring the Built Environment Along the
-Route.''} \emph{Journal of Transport Geography} 78 (June): 56--69.
+Sarjala, Satu. 2019. ``Built Environment Determinants of Pedestrians'
+and Bicyclists' Route Choices on Commute Trips: Applying a New
+Grid-Based Method for Measuring the Built Environment Along the Route.''
+\emph{Journal of Transport Geography} 78 (June): 56--69.
 \url{https://doi.org/10.1016/j.jtrangeo.2019.05.004}.
 
 \leavevmode\hypertarget{ref-Schneider2015}{}%
-Schneider, Robert J., and Joseph Stefanich. 2015. {``Neighborhood
-Characteristics That Support Bicycle Commuting: {Analysis} of the Top
-100 {U}.{S}. Census Tracts.''} \emph{Transportation Research Record:
-Journal of the Transportation Research Board} 2520: 41--51.
+Schneider, Robert J., and Joseph Stefanich. 2015. ``Neighborhood
+Characteristics That Support Bicycle Commuting: Analysis of the Top 100
+U.S. Census Tracts.'' \emph{Transportation Research Record: Journal of
+the Transportation Research Board} 2520: 41--51.
 \url{https://doi.org/DOI:\%2010.3141/2520-06}.
 
+\leavevmode\hypertarget{ref-Scott2019factors}{}%
+Scott, Darren M, and Celenna Ciuro. 2019. ``What Factors Influence Bike
+Share Ridership? An Investigation of Hamilton, Ontario's Bike Share
+Hubs.'' \emph{Travel Behaviour and Society} 16: 50--58.
+
 \leavevmode\hypertarget{ref-scottRouteChoiceBike2021}{}%
-Scott, Darren M., Wei Lu, and Matthew J. Brown. 2021. {``Route Choice of
-Bike Share Users: {Leveraging GPS} Data to Derive Choice Sets.''}
+Scott, Darren M., Wei Lu, and Matthew J. Brown. 2021. ``Route Choice of
+Bike Share Users: Leveraging GPS Data to Derive Choice Sets.''
 \emph{Journal of Transport Geography} 90 (January): 102903.
 \url{https://doi.org/10.1016/j.jtrangeo.2020.102903}.
 
-\leavevmode\hypertarget{ref-Scott2019factors}{}%
-Scott, Darren M, and Celenna Ciuro. 2019. {``What Factors Influence Bike
-Share Ridership? {An} Investigation of {Hamilton}, {Ontario}'s Bike
-Share Hubs.''} \emph{Travel Behaviour and Society} 16: 50--58.
-
 \leavevmode\hypertarget{ref-SkovPetersen2018}{}%
 Skov-Petersen, Hans, Bernhard Barkow, Thomas Lundhede, and Jette Bredahl
-Jacobsen. 2018. {``How Do Cyclists Make Their Way? - {A GPS}-Based
-Revealed Preference Study in {Copenhagen}.''} \emph{International
-Journal of Geographical Information Science} 32 (7): 1469--84.
+Jacobsen. 2018. ``How Do Cyclists Make Their Way? - A GPS-Based Revealed
+Preference Study in Copenhagen.'' \emph{International Journal of
+Geographical Information Science} 32 (7): 1469--84.
 \url{https://doi.org/10.1080/13658816.2018.1436713}.
 
 \leavevmode\hypertarget{ref-solisOpenGeospatialTools2020}{}%
-Solís, Patricia, Jennings Anderson, and Sushil Rajagopalan. 2020.
-{``Open Geospatial Tools for Humanitarian Data Creation, Analysis, and
-Learning Through the Global Lens of {YouthMappers}.''} \emph{Journal of
-Geographical Systems}, November.
-\url{https://doi.org/10.1007/s10109-020-00339-x}.
+Solís, Patricia, Jennings Anderson, and Sushil Rajagopalan. 2020. ``Open
+Geospatial Tools for Humanitarian Data Creation, Analysis, and Learning
+Through the Global Lens of YouthMappers.'' \emph{Journal of Geographical
+Systems}, November. \url{https://doi.org/10.1007/s10109-020-00339-x}.
 
 \leavevmode\hypertarget{ref-Statscan2017}{}%
-Statistics Canada. 2017. {``Journey to Work: {Key} Results from the 2016
-{Census}.''}
+Statistics Canada. 2017. ``Journey to Work: Key Results from the 2016
+Census.''
 https://www150.statcan.gc.ca/n1/en/daily-quotidien/171129/dq171129c-eng.pdf?st=eVPg5Nih.
 
 \leavevmode\hypertarget{ref-Verlinden2019}{}%
 Verlinden, Y and Manaugh, K and Savan, B and Smith Lea, N and Tomalty, R
-and Winters, M. 2019. {``Increasing {Cycling} in {Canada}: {A} Guide to
-What Works.''}
+and Winters, M. 2019. ``Increasing Cycling in Canada: A Guide to What
+Works.''
 https://www.tcat.ca/wp-content/uploads/2019/09/Increasing-Cycling-in-Canada-A-Guide-to-What-Works-2019-09-25.pdf.
 
 \leavevmode\hypertarget{ref-Wickham2019}{}%
 Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy
 D'Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019.
-{``Welcome to the {tidyverse}.''} \emph{Journal of Open Source Software}
-4 (43): 1686. \url{https://doi.org/10.21105/joss.01686}.
+``Welcome to the tidyverse.'' \emph{Journal of Open Source Software} 4
+(43): 1686. \url{https://doi.org/10.21105/joss.01686}.
 
 \leavevmode\hypertarget{ref-Winters2010}{}%
 Winters, Meghan, Michael Brauer, Eleanor M. Setton, and Kay Teschke.
-2010. {``Built Environment Influences on Healthy Transportation Choices:
-{Bicycling} Versus Driving.''} \emph{Journal of Urban Health} 87 (6):
+2010. ``Built Environment Influences on Healthy Transportation Choices:
+Bicycling Versus Driving.'' \emph{Journal of Urban Health} 87 (6):
 969--93. \url{https://doi.org/10.1007/s11524-010-9509-6}.
 
 \leavevmode\hypertarget{ref-Xie2014}{}%
-Xie, Yihui. 2014. {``Knitr: {A} Comprehensive Tool for Reproducible
-Research in {R}.''} In \emph{Implementing Reproducible Computational
+Xie, Yihui. 2014. ``Knitr: A Comprehensive Tool for Reproducible
+Research in R.'' In \emph{Implementing Reproducible Computational
 Research}, edited by Victoria Stodden, Friedrich Leisch, and Roger D.
-Peng. {Chapman and Hall/CRC}.
+Peng. Chapman and Hall/CRC.
 
 \leavevmode\hypertarget{ref-Xie2015}{}%
----------. 2015. \emph{Dynamic Documents with {R} and Knitr}. Second.
-{Boca Raton, Florida}: {Chapman and Hall/CRC}.
+---------. 2015. \emph{Dynamic Documents with R and Knitr}. Second. Boca
+Raton, Florida: Chapman and Hall/CRC.
 
 \leavevmode\hypertarget{ref-yangCyclingfriendlyCityUpdated2019}{}%
 Yang, Yiyang, Xueying Wu, Peiling Zhao, Zhonghua Gou, and Yi Lu. 2019.
-{``Towards a Cycling-Friendly City: {An} Updated Review of the
-Associations Between Built Environment and Cycling Behaviors
-(2007{}).''} \emph{Journal of Transport \& Health} 14: 100613.
+``Towards a Cycling-Friendly City: An Updated Review of the Associations
+Between Built Environment and Cycling Behaviors (20072017).''
+\emph{Journal of Transport \& Health} 14: 100613.
 \url{https://doi.org/10.1016/j.jth.2019.100613}.
 
 \leavevmode\hypertarget{ref-Zahabi2016}{}%
 Zahabi, Seyed Amir H., Annie Chang, Luis F. Miranda-Moreno, and Zachary
-Patterson. 2016. {``Exploring the Link Between the Neighborhood
+Patterson. 2016. ``Exploring the Link Between the Neighborhood
 Typologies, Bicycle Infrastructure and Commuting Cycling over Time and
-the Potential Impact on Commuter {GHG} Emissions.''}
-\emph{Transportation Research Part D: Transport and Environment} 47
-(August): 89--103. \url{https://doi.org/10.1016/j.trd.2016.05.008}.
+the Potential Impact on Commuter GHG Emissions.'' \emph{Transportation
+Research Part D: Transport and Environment} 47 (August): 89--103.
+\url{https://doi.org/10.1016/j.trd.2016.05.008}.
 
 \leavevmode\hypertarget{ref-Zhao2014}{}%
-Zhao, Pengjun. 2014. {``The Impact of the Built Environment on Bicycle
-Commuting: {Evidence} from Beijing.''} \emph{Urban Studies} 51 (5):
+Zhao, Pengjun. 2014. ``The Impact of the Built Environment on Bicycle
+Commuting: Evidence from Beijing.'' \emph{Urban Studies} 51 (5):
 1019--37. \url{https://doi.org/10.1177/0042098013494423}.
 
 \leavevmode\hypertarget{ref-Zhu2019}{}%
-Zhu, Hao. 2019. \emph{{kableExtra}: {Construct} Complex Table with
-'Kable' and Pipe Syntax}. Manual.
-
-\end{CSLReferences}
+Zhu, Hao. 2019. \emph{kableExtra: Construct Complex Table with 'Kable'
+and Pipe Syntax}. Manual.
 
 
 \bibliographystyle{spphys}
