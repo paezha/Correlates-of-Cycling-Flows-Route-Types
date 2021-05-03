@@ -284,11 +284,13 @@ Trips_by_Origin %>%
           aes(linetype = type),
           color = "dark green") +
   scale_size_manual(values = c("Provincial Highway" = 1.5, "Escarpment" = 4.5)) +
-  scale_fill_distiller(direction = 1, trans = "log", breaks = c(20, 55, 148, 403, 1097)) +
+  scale_fill_viridis_c(direction = 1, trans = "log", breaks = c(20, 55, 148, 403, 1097)) +
   xlim(st_bbox(Trips_by_Origin)[1], st_bbox(Trips_by_Origin)[3]) +
   ylim(st_bbox(Trips_by_Origin)[2], st_bbox(Trips_by_Origin)[4]) +
-  theme_map() +
-  theme(legend.title = element_blank())
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank())
 ```
 
 ## Data Sources
@@ -904,7 +906,7 @@ ggplot(data = hamilton) +
                    GTA06_Origin != GTA06_Destination),
           aes(color = residuals),
           size = 2) +
-    scale_color_distiller(palette = "OrRd") +
+    scale_color_viridis_c(name = "Residuals") +
   geom_sf(data = points_interest, 
           color = "red", 
           size = 2) +
@@ -919,11 +921,14 @@ ggplot(data = hamilton) +
   geom_sf(data = escarpment.sf %>% mutate(type = "Escarpment"), 
           aes(linetype = type),
           color = "dark green") +
-  scale_size_manual(values = c("Provincial Highway" = 1.5, "Escarpment" = 4.5)) +
+  scale_size_manual(name = NULL,
+                    values = c("Provincial Highway" = 1.5, 
+                               "Escarpment" = 4.5)) +
+  scale_linetype(name = NULL) +
   xlim(st_bbox(Trips_by_Origin)[1], st_bbox(Trips_by_Origin)[3]) +
   ylim(st_bbox(Trips_by_Origin)[2], st_bbox(Trips_by_Origin)[4]) +
-  theme_map() +
-  theme(legend.title = element_blank())
+  theme_minimal() +
+  theme(axis.text = element_blank())
 ```
 
 Similarly, by plotting the positive residuals, after removing all origin-destination pairs with zero trips, bicycle trip flows that were under-estimated were visualized in Figure \ref{fig:residuals-underestimated}. Given that the majority of trip flows were under-estimated, we visualized trip flows in different maps according to their characteristics. Figure \ref{fig:residuals-over-5km} shows a map of trip flows over 5 km and Figure \ref{fig:residuals-under-5km} shows trip flows under 5 km. One fifth of under-estimated trip flows, approximately 21%, had a *quietest* distance route between 5 and 25 kilometres. Trip distance is an important determinant of cycling for transport [@heinenCommutingBicycleOverview2010], which suggests that the distance between origin and destination could be the reason that these flows were under-estimated. Furthermore, approximately 17% of under-estimated trip flows occurred within the suburban neighbourhoods on the Niagara Escarpment. Fewer cycling trips were expected in this area of the city because bicycle trips are typically less likely in low density areas where there are fewer destinations that can be reached in short distances, as was found to be the case in the United States [@Pucher2006]. It is also worth noting in this case that Hamilton's suburban areas have far less cycling facilities compared to the lower city, which reinforces the car-centric design of these neighbourhoods. Finally, there is a noteworthy cluster of trip flows in the city's downtown core of 5 km or less. Nielsen and Skov-Petersen [-@Nielsen2018] note that built environment attributes are effective at different spatial scales. They uncovered positive effects of cycling infrastructure within 1 km of the home on the probability of cycling, providing evidence that proximity to cycling facilities can influence transport mode choices [@Nielsen2018]. We hypothesize that this cluster was under-estimated because cycling infrastructure has been built more extensively in the downtown core and is likely normalizing travel by bicycle in this area. The connectivity of such infrastructure between zone of origin and zone of destination may not have been captured in the inferred routes used as the cost function, leading to under-estimation. Likewise, the downtown core features a higher density of destinations within a 1-5 km distance that people could comfortably reach by bicycle, compared to residential-only neighbourhoods.
